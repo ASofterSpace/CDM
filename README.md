@@ -29,7 +29,7 @@ build.sh
 To start up the cdm commandline tool after it has been built, you can call:
 
 ```
-cdm --help
+cdm help
 ```
 
 This should work both under Windows (where cdm is expanded to cdm.bat automagically) and Linux (where the cdm shell script is executed.)
