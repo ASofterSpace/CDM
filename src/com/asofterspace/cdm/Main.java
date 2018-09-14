@@ -47,7 +47,7 @@ public class Main {
 			case "convert":
 				if (args.length > 4) {
 					convertCdm(args[1], args[2], args[3], args[4]);
-				} else if (args.length > 2) {
+				} else if (args.length > 3) {
 					convertCdm(args[1], args[2], args[3], null);
 				} else {
 					System.err.println("You called  cdm convert  which should be followed by the target version, target format, a CDM source path, and optionally a CDM destination path, but did not specify these arguments.");
