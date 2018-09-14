@@ -229,6 +229,7 @@ public class Main {
 		System.out.println("");
 		System.out.println("Available commands:");
 		System.out.println("");
+		// TODO :: add create <path> [<template>] (e.g. just empty MCM root - for this, see the tinyCdm template, or MCM root with default route and sap - as we currently are doing, or MCM root with route, sap and an example activity and an example argument type)
 		System.out.println("info <path> .. shows information about the CDM lying at the path");
 		System.out.println("");
 		System.out.println("convert <[targetVersionPrefix:]targetVersion> <targetFormat> <sourcePath> [<destinationPath>] .. converts the CDM lying at the source path to the target version (optionally including a custom prefix, by default using the correct one) and format and saves it in the destination path, or overwrites the CDM on disk if no destination path is given");
@@ -244,6 +245,10 @@ public class Main {
 		System.out.println("");
 		System.out.println("validate <path> .. validates the CDM lying at the path");
 		System.out.println("");
+		// TODO :: add list commands, e.g. list parameters, list activities, list scripts, ...
+		// TODO :: add command to show the MCM tree
+		// TODO :: add command to read a particular script, that is, get the content of that script and print it to system out
+		// TODO :: add command to rename the root node (e.g. to mcmRoot for simpler starting with default config)
 		System.out.println("version .. shows the version of the " + PROGRAM_TITLE);
 		System.out.println("");
 		System.out.println("help .. shows this help");
