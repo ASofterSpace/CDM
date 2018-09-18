@@ -21,7 +21,7 @@ build.bat
 Or under Linux:
 
 ```
-build.sh
+./build.sh
 ```
 
 You then probably will also want to adjust your `PATH` variable, to add the path to the repository on your hard drive. (You don't really have to do this, but if you do not, then you always need to manually go to the cdm directory to execute the `cdm` command, and you might get tired of that. ^^)
