@@ -16,8 +16,8 @@ import java.util.List;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.0.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 16. September 2018";
+	public final static String VERSION_NUMBER = "0.0.0.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 18. September 2018";
 
 	public static void main(String[] args) {
 
@@ -29,7 +29,7 @@ public class Main {
 		// if we were called without arguments...
 		if (args.length < 1) {
 			// ... tell everyone that this is basically nonsense!
-			showHelp();
+			showHelp(null);
 			System.exit(1);
 		}
 
@@ -71,7 +71,11 @@ public class Main {
 				}
 				break;
 			case "help":
-				showHelp();
+				if (args.length > 1) {
+					showHelp(args[1]);
+				} else {
+					showHelp(null);
+				}
 				break;
 			case "version":
 				showVersion();
@@ -275,47 +279,88 @@ public class Main {
 		System.out.println("The CDM looks valid to me!");
 	}
 
-	private static void showHelp() {
-		System.out.println("Welcome to the " + Utils.getFullProgramIdentifier() + "! :)");
-		System.out.println("");
-		System.out.println("Available commands:");
-		System.out.println("");
-		System.out.println("create <template> <[targetVersionPrefix:]targetVersion> <path> .. creates a new CDM of the specified version at the specified path, using one of the available templates for it");
-		System.out.println("  available templates:");
-		List<String> templates = CdmCtrl.getTemplates();
-		List<String> templatesShort = CdmCtrl.getTemplatesShort();
-		for (int i = 0; i < templates.size(); i++) {
-			System.out.println("    " + templatesShort.get(i) + " .. " + templates.get(i));
+	private static void showHelp(String command) {
+
+		final String HELP_CREATE = "create <template> <[targetVersionPrefix:]targetVersion> <path> .. creates a new CDM of the specified version at the specified path, using one of the available templates for it";
+		final String HELP_INFO = "info <path> .. shows information about the CDM lying at the path";
+		final String HELP_CONVERT = "convert <[targetVersionPrefix:]targetVersion> <targetFormat> <sourcePath> [<destinationPath>] .. converts the CDM lying at the source path to the target version (optionally including a custom prefix, by default using the correct one) and format and saves it in the destination path, or overwrites the CDM on disk if no destination path is given";
+		final String HELP_VALIDATE = "validate <path> .. validates the CDM lying at the path";
+		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
+		final String HELP_HELP = "help [command] .. shows the help, optionally detailed help for a specific command";
+
+		if (command == null) {
+			System.out.println("Welcome to the " + Utils.getFullProgramIdentifier() + "! :)");
+			System.out.println("");
+			System.out.println("Available commands:");
+			System.out.println("");
+			System.out.println("* " + HELP_CREATE);
+			System.out.println("* " + HELP_INFO);
+			System.out.println("* " + HELP_CONVERT);
+			System.out.println("* " + HELP_VALIDATE);
+			System.out.println("* " + HELP_VERSION);
+			System.out.println("* " + HELP_HELP);
+			// TODO :: add list commands, e.g. list parameters, list activities, list scripts, ...
+			// TODO :: add command to show the MCM tree
+			// TODO :: add command to read a particular script, that is, get the content of that script and print it to system out
+			// TODO :: add command to rename the root node (e.g. to mcmRoot for simpler starting with default config)
+		} else {
+
+			switch (command.toLowerCase()) {
+
+				case "create":
+					System.out.println(HELP_CREATE);
+					System.out.println("");
+					System.out.println("  available templates:");
+					List<String> templates = CdmCtrl.getTemplates();
+					List<String> templatesShort = CdmCtrl.getTemplatesShort();
+					for (int i = 0; i < templates.size(); i++) {
+						System.out.println("    " + templatesShort.get(i) + " .. " + templates.get(i));
+					}
+					System.out.println("    - .. default template (" + templates.get(0) + ")");
+					System.out.println("");
+					System.out.println("  supported versions:");
+					for (String ver : CdmCtrl.getKnownCdmVersions()) {
+						System.out.println("    " + ver);
+					}
+					System.out.println("    - .. highest available version (" + CdmCtrl.getHighestKnownCdmVersion() + ")");
+					break;
+
+				case "info":
+					System.out.println(HELP_INFO);
+					break;
+
+				case "convert":
+					System.out.println(HELP_CONVERT);
+					System.out.println("");
+					System.out.println("  supported target versions:");
+					for (String ver : CdmCtrl.getKnownCdmVersions()) {
+						System.out.println("    " + ver);
+					}
+					System.out.println("    - .. keep the current version");
+					System.out.println("");
+					System.out.println("  supported target formats:");
+					System.out.println("    xml .. human-readable CDM format based on XML");
+					System.out.println("    - .. keep the current format");
+					// TODO :: also add EMF, JSON, CSV, ZIP, etc.
+					break;
+
+				case "validate":
+					System.out.println(HELP_VALIDATE);
+					break;
+
+				case "version":
+					System.out.println(HELP_VERSION);
+					break;
+
+				case "help":
+					System.out.println(HELP_HELP);
+					break;
+
+				default:
+					System.err.println("Whoopsie! I do not actually know the command '" + command +
+						"', so I cannot offer any help with it...");
+			}
 		}
-		System.out.println("    - .. default template (" + templates.get(0) + ")");
-		System.out.println("  supported versions:");
-		for (String ver : CdmCtrl.getKnownCdmVersions()) {
-			System.out.println("    " + ver);
-		}
-		System.out.println("    - .. highest available version (" + CdmCtrl.getHighestKnownCdmVersion() + ")");
-		System.out.println("");
-		System.out.println("info <path> .. shows information about the CDM lying at the path");
-		System.out.println("");
-		System.out.println("convert <[targetVersionPrefix:]targetVersion> <targetFormat> <sourcePath> [<destinationPath>] .. converts the CDM lying at the source path to the target version (optionally including a custom prefix, by default using the correct one) and format and saves it in the destination path, or overwrites the CDM on disk if no destination path is given");
-		System.out.println("  supported target versions:");
-		for (String ver : CdmCtrl.getKnownCdmVersions()) {
-			System.out.println("    " + ver);
-		}
-		System.out.println("    - .. keep the current version");
-		System.out.println("  supported target formats:");
-		System.out.println("    xml .. human-readable CDM format based on XML");
-		System.out.println("    - .. keep the current format");
-		// TODO :: also add EMF, JSON, CSV, ZIP, etc.
-		System.out.println("");
-		System.out.println("validate <path> .. validates the CDM lying at the path");
-		System.out.println("");
-		// TODO :: add list commands, e.g. list parameters, list activities, list scripts, ...
-		// TODO :: add command to show the MCM tree
-		// TODO :: add command to read a particular script, that is, get the content of that script and print it to system out
-		// TODO :: add command to rename the root node (e.g. to mcmRoot for simpler starting with default config)
-		System.out.println("version .. shows the version of the " + PROGRAM_TITLE);
-		System.out.println("");
-		System.out.println("help .. shows this help");
 	}
 
 	private static void showVersion() {
