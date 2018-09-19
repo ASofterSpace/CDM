@@ -241,9 +241,20 @@ public class Main {
 
 		} else {
 
+			Directory destDir = new Directory(destinationPath);
+
+			// complain if the directory is not empty, unless the source and destination are the same
+			if (!originPath.equals(destinationPath)) {
+				Boolean isEmpty = destDir.isEmpty();
+				if ((isEmpty == null) || !isEmpty) {
+					System.err.println("The specified destination directory is not empty - please save the conversion result into an empty directory!");
+					System.exit(9);
+				}
+			}
+
 			// save the result to the new destination path
 			// TODO :: do not ignore the target format once we have more than XML available!
-			CdmCtrl.saveTo(new Directory(destinationPath));
+			CdmCtrl.saveTo(destDir);
 		}
 
 		if ("".equals(conversionTargetStr)) {
