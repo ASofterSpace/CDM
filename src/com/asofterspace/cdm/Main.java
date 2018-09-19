@@ -70,6 +70,18 @@ public class Main {
 					System.exit(4);
 				}
 				break;
+			case "uuid":
+				if (args.length > 3) {
+					uuid(args[1], args[2], args[3]);
+				} else if (args.length > 2) {
+					uuid(args[1], args[2], null);
+				} else if (args.length > 1) {
+					uuid(args[1], null, null);
+				} else {
+					System.err.println("You called  cdm uuid  which should be followed by an instruction on what to do with the UUID - e.g. generate a UUID, convert a UUID to a different format, etc. - but you did not supply that instruction.");
+					System.exit(4);
+				}
+				break;
 			case "help":
 				if (args.length > 1) {
 					showHelp(args[1]);
@@ -290,12 +302,74 @@ public class Main {
 		System.out.println("The CDM looks valid to me!");
 	}
 
+	private static void uuid(String action, String argument1, String argument2) {
+
+		switch (action.toLowerCase()) {
+
+			case "generate":
+				if ((argument1 == null) || "-".equals(argument1)) {
+					argument1 = "default";
+				}
+
+				switch (argument1.toLowerCase()) {
+					case "java":
+					case "default":
+						System.out.println(Utils.generateJavaUUID());
+						return;
+					case "ecore":
+					case "emf":
+						System.out.println(Utils.generateEcoreUUID());
+						return;
+					default:
+						System.err.println("A UUID in the format '" + argument1 +
+							"' cannot be created, as the format is not known... sorry!");
+						System.exit(10);
+				}
+				break;
+
+			case "convert":
+				if ((argument1 == null) || "-".equals(argument1)) {
+					argument1 = "default";
+				}
+
+				if (argument2 == null) {
+					System.err.println("You called  cdm uuid convert " + argument1 +
+						"  which should usually be followed by the UUID to convert, " +
+						"but you left it out, so there is nothing to convert.");
+					System.exit(4);
+				}
+
+				switch (argument1.toLowerCase()) {
+					case "java":
+					case "default":
+						System.out.println(Utils.convertEcoreUUIDtoJava(argument2));
+						return;
+					case "ecore":
+					case "emf":
+						System.out.println(Utils.convertJavaUUIDtoEcore(argument2));
+						return;
+					default:
+						System.err.println(argument2 + " cannot be converted to the format '" + argument2 +
+							"', as the format is not known... sorry!");
+						System.exit(10);
+				}
+
+				break;
+
+			default:
+				System.err.println("You called  cdm uuid " + action +
+						"  but this action cannot be understood.");
+				System.exit(11);
+		}
+	}
+
 	private static void showHelp(String command) {
 
 		final String HELP_CREATE = "create <template> <[targetVersionPrefix:]targetVersion> <path> .. creates a new CDM of the specified version at the specified path, using one of the available templates for it";
 		final String HELP_INFO = "info <path> .. shows information about the CDM lying at the path";
 		final String HELP_CONVERT = "convert <[targetVersionPrefix:]targetVersion> <targetFormat> <sourcePath> [<destinationPath>] .. converts the CDM lying at the source path to the target version (optionally including a custom prefix, by default using the correct one) and format and saves it in the destination path, or overwrites the CDM on disk if no destination path is given";
 		final String HELP_VALIDATE = "validate <path> .. validates the CDM lying at the path";
+		final String HELP_UUID = "uuid <action> <type> [<argument>] .. performs a UUID action";
 		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
 		final String HELP_HELP = "help [command] .. shows the help, optionally detailed help for a specific command";
 
@@ -308,6 +382,7 @@ public class Main {
 			System.out.println("* " + HELP_INFO);
 			System.out.println("* " + HELP_CONVERT);
 			System.out.println("* " + HELP_VALIDATE);
+			System.out.println("* " + HELP_UUID);
 			System.out.println("* " + HELP_VERSION);
 			System.out.println("* " + HELP_HELP);
 			// TODO :: add list commands, e.g. list parameters, list activities, list scripts, ...
@@ -357,6 +432,14 @@ public class Main {
 
 				case "validate":
 					System.out.println(HELP_VALIDATE);
+					break;
+
+				case "uuid":
+					System.out.println(HELP_UUID);
+					System.out.println("");
+					System.out.println("  available actions:");
+					System.out.println("    generate [<format>] .. generate a Java or EMF UUID, depending on the chosen format");
+					System.out.println("    convert <newFormat> <uuid> .. converts a Java UUID to EMF or the other way around, depending on the chosen format");
 					break;
 
 				case "version":
