@@ -371,7 +371,7 @@ public class Main {
 		final String HELP_VALIDATE = "validate <path> .. validates the CDM lying at the path";
 		final String HELP_UUID = "uuid <action> <type> [<argument>] .. performs a UUID action";
 		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
-		final String HELP_HELP = "help [command] .. shows the help, optionally detailed help for a specific command";
+		final String HELP_HELP = "help [<command>] .. shows the help, optionally detailed help for a specific command";
 
 		if (command == null) {
 			System.out.println("Welcome to the " + Utils.getFullProgramIdentifier() + "! :)");
