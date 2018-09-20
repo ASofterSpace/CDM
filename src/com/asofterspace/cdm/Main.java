@@ -3,6 +3,7 @@ package com.asofterspace.cdm;
 import com.asofterspace.toolbox.cdm.CdmCtrl;
 import com.asofterspace.toolbox.cdm.exceptions.AttemptingEmfException;
 import com.asofterspace.toolbox.cdm.exceptions.CdmLoadingException;
+import com.asofterspace.toolbox.coders.UuidEncoderDecoder;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.utils.ProgressIndicator;
@@ -16,8 +17,8 @@ import java.util.List;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.0.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 18. September 2018";
+	public final static String VERSION_NUMBER = "0.0.0.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 20. September 2018";
 
 	public static void main(String[] args) {
 
@@ -314,11 +315,11 @@ public class Main {
 				switch (argument1.toLowerCase()) {
 					case "java":
 					case "default":
-						System.out.println(Utils.generateJavaUUID());
+						System.out.println(UuidEncoderDecoder.generateJavaUUID());
 						return;
 					case "ecore":
 					case "emf":
-						System.out.println(Utils.generateEcoreUUID());
+						System.out.println(UuidEncoderDecoder.generateEcoreUUID());
 						return;
 					default:
 						System.err.println("A UUID in the format '" + argument1 +
@@ -342,11 +343,11 @@ public class Main {
 				switch (argument1.toLowerCase()) {
 					case "java":
 					case "default":
-						System.out.println(Utils.convertEcoreUUIDtoJava(argument2));
+						System.out.println(UuidEncoderDecoder.convertEcoreUUIDtoJava(argument2));
 						return;
 					case "ecore":
 					case "emf":
-						System.out.println(Utils.convertJavaUUIDtoEcore(argument2));
+						System.out.println(UuidEncoderDecoder.convertJavaUUIDtoEcore(argument2));
 						return;
 					default:
 						System.err.println(argument2 + " cannot be converted to the format '" + argument2 +

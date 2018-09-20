@@ -16,6 +16,7 @@ mkdir cdm
 cd cdm
 mkdir exceptions
 cd ..
+mkdir coders
 mkdir io
 mkdir utils
 mkdir web
@@ -25,6 +26,7 @@ cd ../../../..
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/*.java src/com/asofterspace/toolbox
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/cdm/*.* src/com/asofterspace/toolbox/cdm
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/cdm/exceptions/*.* src/com/asofterspace/toolbox/cdm/exceptions
+cp ../Toolbox-Java/src/com/asofterspace/toolbox/coders/*.* src/com/asofterspace/toolbox/coders
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/io/*.* src/com/asofterspace/toolbox/io
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/web/*.* src/com/asofterspace/toolbox/web
@@ -37,6 +39,6 @@ cd src
 
 find . -name "*.java" > sourcefiles.list
 
-javac -cp "../emf/*" -d ../bin @sourcefiles.list
+javac -encoding utf8 -cp "../emf/*" -d ../bin @sourcefiles.list
 
 cd ..
