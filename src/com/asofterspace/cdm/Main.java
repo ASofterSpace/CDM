@@ -114,13 +114,17 @@ public class Main {
 		System.exit(0);
 	}
 
-	private static void loadCdm(String pathArg) {
+	private static void loadCdm(String pathArg, boolean loadFullModel) {
 
 		Directory cdmDir = new Directory(pathArg);
 		ProgressIndicator noProgress = new NoOpProgressIndicator();
 
 		try {
-			CdmCtrl.loadCdmDirectory(cdmDir, noProgress);
+			if (loadFullModel) {
+				CdmCtrl.loadCdmDirectory(cdmDir, noProgress);
+			} else {
+				CdmCtrl.loadCdmDirectoryFaster(cdmDir, noProgress);
+			}
 		} catch (AttemptingEmfException | CdmLoadingException e) {
 			System.err.println(e.getMessage());
 			System.exit(3);
@@ -201,7 +205,7 @@ public class Main {
 		}
 
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
-		loadCdm(pathArg);
+		loadCdm(pathArg, false);
 		
 		List<Node> nodesFound = new ArrayList<>();
 
@@ -229,7 +233,7 @@ public class Main {
 	private static void showInfo(String pathArg) {
 
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
-		loadCdm(pathArg);
+		loadCdm(pathArg, false);
 
 		String cdmVersion = CdmCtrl.getCdmVersion();
 		String cdmPrefix = CdmCtrl.getCdmVersionPrefix();
@@ -297,7 +301,7 @@ public class Main {
 		}
 
 		// now attempt to load the CDM from the origin path
-		loadCdm(pathArg);
+		loadCdm(pathArg, false);
 
 		// do the conversion to a different version (and possibly prefix)
 		if ("-".equals(toVersion)) {
@@ -364,7 +368,7 @@ public class Main {
 	private static void validate(String pathArg) {
 
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
-		loadCdm(pathArg);
+		loadCdm(pathArg, true);
 
 		List<String> problems = new ArrayList<>();
 
