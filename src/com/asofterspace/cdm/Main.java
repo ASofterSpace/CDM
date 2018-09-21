@@ -1,6 +1,7 @@
 package com.asofterspace.cdm;
 
 import com.asofterspace.toolbox.cdm.CdmCtrl;
+import com.asofterspace.toolbox.cdm.CdmNode;
 import com.asofterspace.toolbox.cdm.exceptions.AttemptingEmfException;
 import com.asofterspace.toolbox.cdm.exceptions.CdmLoadingException;
 import com.asofterspace.toolbox.coders.ConversionException;
@@ -14,8 +15,10 @@ import com.asofterspace.toolbox.web.JSON;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class Main {
@@ -53,6 +56,7 @@ public class Main {
 				i++;
 			} else {
 				System.err.println("The argument '" + args[i] + "' was not understood - please check  cdm help " + firstarg);
+				System.exit(4);
 			}
 		}
 		
@@ -198,7 +202,6 @@ public class Main {
 	
 	private static void findInCdm(String pathArg, Map<String, String> arguments) {
 
-		/* TODO :: get this to work
 		if (pathArg == null) {
 			System.err.println("You called  cdm find  but did not specify a CDM path to open - please do.");
 			System.exit(4);
@@ -207,27 +210,54 @@ public class Main {
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
 		loadCdm(pathArg, false);
 		
-		List<Node> nodesFound = new ArrayList<>();
+		Set<CdmNode> nodesFound = new HashSet<>();
+
+		// TODO :: add another switch that allows searching only for elements that have this AND that instead of this OR that
+		// (right now, we search e.g. for elements with this name OR that tag, but maybe someone wants to search for elements
+		// that have this name AND that tag!)
 
 		// find by UUID
 		if (arguments.containsKey("-u")) {
-			nodesFound.addAll(CdmCtrl.findByUuid(arguments.get("-u")));
+			String uuid = arguments.get("-u");
+			try {
+				uuid = UuidEncoderDecoder.ensureUUIDisEcore(uuid);
+			} catch (ConversionException e) {
+				System.err.println(e.getMessage());
+				System.exit(11);
+			}
+			nodesFound.addAll(CdmCtrl.findByUuid(uuid));
 		}
 		
 		// find by name
-		if (arguments.get("-n")) {
+		if (arguments.containsKey("-n")) {
 			nodesFound.addAll(CdmCtrl.findByName(arguments.get("-n")));
 		}
 		
-		// find by tag
-		if (arguments.get("-t")) {
-			nodesFound.addAll(CdmCtrl.findByTag(arguments.get("-t")));
+		// find by type
+		if (arguments.containsKey("-t")) {
+			nodesFound.addAll(CdmCtrl.findByType(arguments.get("-t")));
 		}
 		
-		for (Node node : nodesFound) {
-			// TODO :: print out each node
+		// find by xml tag
+		if (arguments.containsKey("-x")) {
+			nodesFound.addAll(CdmCtrl.findByXmlTag(arguments.get("-x")));
 		}
-		*/
+		
+		if (nodesFound.size() == 0) {
+			System.out.println("No entities have been found, sorry.");
+			return;
+		}
+		
+		if (nodesFound.size() == 1) {
+			System.out.println("1 entity has been found:");
+		} else {
+			System.out.println(nodesFound.size() + " entities have been found:");
+		}
+		
+		for (CdmNode node : nodesFound) {
+			System.out.println("");
+			node.print();
+		}
 	}
 
 	private static void showInfo(String pathArg) {
@@ -451,11 +481,12 @@ public class Main {
 
 	private static void showHelp(String command) {
 
-		final String HELP_CREATE = "create [-t <template>] [-f <targetFormat>] [-p <targetVersionPrefix>] [-v <targetVersion>] <cdmPath> .. creates a new CDM";
-		final String HELP_CONVERT = "convert [-f <targetFormat>] [-p <targetVersionPrefix>] [-v <targetVersion>] [-d <destinationCdmPath>] <cdmPath> .. converts the CDM";
+		final String HELP_CREATE = "create [-t <template>] [-f <format>] [-p <versionPrefix>] [-v <version>] <cdmPath> .. creates a new CDM";
+		final String HELP_CONVERT = "convert [-f <format>] [-p <versionPrefix>] [-v <version>] [-d <destinationCdmPath>] <cdmPath> .. converts the CDM";
 		final String HELP_VALIDATE = "validate <cdmPath> .. validates the CDM";
 		final String HELP_INFO = "info <cdmPath> .. shows information about the CDM";
-		final String HELP_FIND = "find [-u <uuid>] [-n <name>] <cdmPath> .. finds an element in the CDM";
+		// TODO :: add specific command for finding the root element... maybe just  cdm root ../../  prints the root node, and  cdm root mcmRoot ../../  sets it?
+		final String HELP_FIND = "find [-u <uuid>] [-n <name>] [-t <type>] [-x <xmltag>] <cdmPath> .. finds an element in the CDM";
 		final String HELP_UUID = "uuid [-k <kind>] [<uuid>] .. generates or converts a UUID";
 		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
 		final String HELP_HELP = "help [<command>] .. shows the help, optionally detailed help for a specific command";
@@ -538,7 +569,8 @@ public class Main {
 					System.out.println("");
 					System.out.println("  -u UUID .. if specified, find an element by its UUID");
 					System.out.println("  -n name .. if specified, find an element by its name");
-					System.out.println("  -t tag .. if specified, find an element by its tag");
+					System.out.println("  -t type .. if specified, find an element by its xsi type");
+					System.out.println("  -x xmltag .. if specified, find an element by its xml tag");
 					break;
 
 				case "uuid":
