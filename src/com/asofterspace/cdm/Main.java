@@ -46,8 +46,7 @@ public class Main {
 		
 		// we start at 1 (as 0 is already the firstarg), and go up to < args.length - 2,
 		// as we want to be strictly less than args.length, but one less because that is
-		// already the lastarg (and in theory one less even more because we always just
-		// look at every second one - always -x xxx - but we can also just leave that out)
+		// already the lastarg, if there is one
 		for (int i = 1; i < args.length - 1; i++) {
 			if (args[i].startsWith("-")) {
 				arguments.put(args[i].toLowerCase(), args[i+1]);
@@ -60,7 +59,10 @@ public class Main {
 		// ... get the last argument
 		String lastarg = null;
 		if (args.length > 1) {
-			lastarg = args[args.length - 1];
+			// in the case of  cdm uuid -k ecore  we have no last arg, as we have an odd amount of arguments!
+			if (args.length % 2 == 0) {
+				lastarg = args[args.length - 1];
+			}
 		}
 
 		// check all the arguments
