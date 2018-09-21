@@ -3,7 +3,9 @@ package com.asofterspace.cdm;
 import com.asofterspace.toolbox.cdm.CdmCtrl;
 import com.asofterspace.toolbox.cdm.exceptions.AttemptingEmfException;
 import com.asofterspace.toolbox.cdm.exceptions.CdmLoadingException;
+import com.asofterspace.toolbox.coders.ConversionException;
 import com.asofterspace.toolbox.coders.UuidEncoderDecoder;
+import com.asofterspace.toolbox.coders.UuidEncoderDecoder.UuidKind;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.utils.ProgressIndicator;
@@ -19,8 +21,8 @@ import java.util.Map;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.0.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 20. September 2018";
+	public final static String VERSION_NUMBER = "0.0.0.8(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 21. September 2018";
 
 	public static void main(String[] args) {
 
@@ -42,7 +44,11 @@ public class Main {
 		// ... get a map of all modifiers ...
 		Map<String, String> arguments = new HashMap<String, String>();
 		
-		for (int i = 0; i < args.length - 2; i++) {
+		// we start at 1 (as 0 is already the firstarg), and go up to < args.length - 2,
+		// as we want to be strictly less than args.length, but one less because that is
+		// already the lastarg (and in theory one less even more because we always just
+		// look at every second one - always -x xxx - but we can also just leave that out)
+		for (int i = 1; i < args.length - 1; i++) {
 			if (args[i].startsWith("-")) {
 				arguments.put(args[i].toLowerCase(), args[i+1]);
 				i++;
@@ -381,7 +387,6 @@ public class Main {
 
 	private static void uuid(String mainArg, Map<String, String> arguments) {
 
-		/* TODO :: get this to work
 		String kind = "-";
 		
 		if (arguments.containsKey("-k")) {
@@ -410,39 +415,32 @@ public class Main {
 		
 		// on the other hand, if an argument is given... convert!
 	
-		UuidEncoderDecoder.Kind currentKind = UuidEncoderDecoder.detectUUIDtype(mainArg);
+		UuidKind currentKind = UuidEncoderDecoder.detectUUIDkind(mainArg);
 	
 		switch (kind.toLowerCase()) {
 			case "java":
 			case "-":
-				if (UuidEncoderDecoder.Kind.ECORE.equals(currentKind)) {
-					System.out.println(UuidEncoderDecoder.convertEcoreUUIDtoJava(mainArg));
-				} else if (UuidEncoderDecoder.Kind.JAVA.equals(currentKind)) {
-					System.out.println(UuidEncoderDecoder.prettifyJavaUUID(mainArg));
-				} else {
-					System.err.println("The UUID that you wanted me to convert cannot be recognized, sorry.");
+				try {
+					System.out.println(UuidEncoderDecoder.ensureUUIDisJava(mainArg));
+				} catch (ConversionException e) {
+					System.err.println(e.getMessage());
 					System.exit(11);
 				}
-				return;
+				break;
 			case "ecore":
 			case "emf":
-				if (UuidEncoderDecoder.Kind.ECORE.equals(currentKind)) {
-					System.out.println(UuidEncoderDecoder.prettifyEcoreUUID(mainArg));
-				} else if (UuidEncoderDecoder.Kind.JAVA.equals(currentKind)) {
-					System.out.println(UuidEncoderDecoder.convertJavaUUIDtoEcore(mainArg));
-				} else {
-					System.err.println("The UUID that you wanted me to convert cannot be recognized, sorry.");
+				try {
+					System.out.println(UuidEncoderDecoder.ensureUUIDisEcore(mainArg));
+				} catch (ConversionException e) {
+					System.err.println(e.getMessage());
 					System.exit(11);
 				}
-				
-				System.out.println(UuidEncoderDecoder.convertJavaUUIDtoEcore(mainArg));
-				return;
+				break;
 			default:
 				System.err.println("Your UUID cannot be converted into the format '" + kind +
 					"', as the format is not known... sorry!");
 				System.exit(10);
 		}
-		*/
 	}
 
 	private static void showHelp(String command) {
