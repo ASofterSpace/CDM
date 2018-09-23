@@ -1,6 +1,7 @@
 package com.asofterspace.cdm;
 
 import com.asofterspace.toolbox.cdm.CdmCtrl;
+import com.asofterspace.toolbox.cdm.CdmMonitoringControlElement;
 import com.asofterspace.toolbox.cdm.CdmNode;
 import com.asofterspace.toolbox.cdm.exceptions.AttemptingEmfException;
 import com.asofterspace.toolbox.cdm.exceptions.CdmLoadingException;
@@ -37,7 +38,7 @@ public class Main {
 		// if we were called without arguments...
 		if (args.length < 1) {
 			// ... tell everyone that this is basically nonsense!
-			showHelp(null);
+			showHelp(null, null);
 			System.exit(1);
 		}
 		
@@ -78,20 +79,13 @@ public class Main {
 				convertCdm(lastarg, arguments);
 				break;
 			case "validate":
-				if (args.length > 1) {
-					validate(args[1]);
-				} else {
-					System.err.println("You called  cdm validate  which should be followed by a CDM path, but did not specify a CDM path.");
-					System.exit(4);
-				}
+				validate(lastarg, arguments);
 				break;
 			case "info":
-				if (args.length > 1) {
-					showInfo(args[1]);
-				} else {
-					System.err.println("You called  cdm info  which should be followed by a CDM path, but did not specify a CDM path.");
-					System.exit(4);
-				}
+				showInfo(lastarg, arguments);
+				break;
+			case "tree":
+				showTree(lastarg, arguments);
 				break;
 			case "find":
 				findInCdm(lastarg, arguments);
@@ -100,14 +94,10 @@ public class Main {
 				uuid(lastarg, arguments);
 				break;
 			case "version":
-				showVersion();
+				showVersion(lastarg, arguments);
 				break;
 			case "help":
-				if (args.length > 1) {
-					showHelp(args[1]);
-				} else {
-					showHelp(null);
-				}
+				showHelp(lastarg, arguments);
 				break;
 			default:
 				System.err.println("Sorry, I did not understand the argument '" + args[0] + "' - call  cdm help  to get a list of possible commands.");
@@ -260,7 +250,12 @@ public class Main {
 		}
 	}
 
-	private static void showInfo(String pathArg) {
+	private static void showInfo(String pathArg, Map<String, String> arguments) {
+
+		if (pathArg == null) {
+			System.err.println("You called  cdm info  but did not specify a CDM path of the CDM for which information should be shown - please do.");
+			System.exit(4);
+		}
 
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
 		loadCdm(pathArg, false);
@@ -271,6 +266,47 @@ public class Main {
 		System.out.println("CDM version prefix: " + cdmPrefix);
 		System.out.println("CDM compatible with EGS-CC release: " + CdmCtrl.getCompatWithEGSCCstr(cdmVersion, cdmPrefix));
 		System.out.println("CDM compatible with RTF Framework CDM editor version: " + CdmCtrl.getCompatWithMCDEstr(cdmVersion, cdmPrefix));
+	}
+
+	private static void showTree(String pathArg, Map<String, String> arguments) {
+
+		if (pathArg == null) {
+			System.err.println("You called  cdm info  but did not specify a CDM path of the CDM for which information should be shown - please do.");
+			System.exit(4);
+		}
+
+		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
+		// (however, not sure if the tree can be constructed from just one file... ah well, it will work out somehow ^^)
+		loadCdm(pathArg, true);
+		
+		Set<CdmMonitoringControlElement> roots = CdmCtrl.getAllMcmTreeRoots();
+		
+		if (roots.size() < 1) {
+			System.err.println("The CDM that you specified does not seem to contain an MCM tree!");
+			System.exit(12);
+		}
+		
+		boolean isFirst = true;
+
+		for (CdmMonitoringControlElement root : roots) {
+
+			if (!isFirst) {
+				System.out.println("");
+			}
+
+			recursivelyShowTree(root, "");
+
+			isFirst = false;
+		}
+	}
+	
+	private static void recursivelyShowTree(CdmMonitoringControlElement mce, String prefix) {
+		
+		System.out.println(prefix + mce.getName());
+		
+		for (CdmMonitoringControlElement child : mce.getSubElements()) {
+			recursivelyShowTree(child, "  " + prefix);
+		}
 	}
 
 	/**
@@ -395,8 +431,13 @@ public class Main {
 		}
 	}
 
-	private static void validate(String pathArg) {
+	private static void validate(String pathArg, Map<String, String> arguments) {
 
+		if (pathArg == null) {
+			System.err.println("You called  cdm validate  but did not specify a CDM path of the CDM that should be validated - please do.");
+			System.exit(4);
+		}
+		
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
 		loadCdm(pathArg, true);
 
@@ -479,19 +520,20 @@ public class Main {
 		}
 	}
 
-	private static void showHelp(String command) {
+	private static void showHelp(String mainArg, Map<String, String> arguments) {
 
 		final String HELP_CREATE = "create [-t <template>] [-f <format>] [-p <versionPrefix>] [-v <version>] <cdmPath> .. creates a new CDM";
 		final String HELP_CONVERT = "convert [-f <format>] [-p <versionPrefix>] [-v <version>] [-d <destinationCdmPath>] <cdmPath> .. converts the CDM";
 		final String HELP_VALIDATE = "validate <cdmPath> .. validates the CDM";
 		final String HELP_INFO = "info <cdmPath> .. shows information about the CDM";
+		final String HELP_TREE = "tree <cdmPath> .. shows the CDM tree";
 		// TODO :: add specific command for finding the root element... maybe just  cdm root ../../  prints the root node, and  cdm root mcmRoot ../../  sets it?
 		final String HELP_FIND = "find [-u <uuid>] [-n <name>] [-t <type>] [-x <xmltag>] <cdmPath> .. finds an element in the CDM";
 		final String HELP_UUID = "uuid [-k <kind>] [<uuid>] .. generates or converts a UUID";
 		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
 		final String HELP_HELP = "help [<command>] .. shows the help, optionally detailed help for a specific command";
 
-		if (command == null) {
+		if (mainArg == null) {
 			System.out.println("Welcome to the " + Utils.getFullProgramIdentifier() + "! :)");
 			System.out.println("");
 			System.out.println("Available commands:");
@@ -500,6 +542,7 @@ public class Main {
 			System.out.println("* " + HELP_CONVERT);
 			System.out.println("* " + HELP_VALIDATE);
 			System.out.println("* " + HELP_INFO);
+			System.out.println("* " + HELP_TREE);
 			System.out.println("* " + HELP_FIND);
 			System.out.println("* " + HELP_UUID);
 			System.out.println("* " + HELP_VERSION);
@@ -510,7 +553,7 @@ public class Main {
 			// TODO :: add command to rename the root node (e.g. to mcmRoot for simpler starting with default config)
 		} else {
 
-			switch (command.toLowerCase()) {
+			switch (mainArg.toLowerCase()) {
 
 				case "create":
 					System.out.println(HELP_CREATE);
@@ -539,6 +582,10 @@ public class Main {
 
 				case "info":
 					System.out.println(HELP_INFO);
+					break;
+
+				case "tree":
+					System.out.println(HELP_TREE);
 					break;
 
 				case "convert":
@@ -594,13 +641,13 @@ public class Main {
 					break;
 
 				default:
-					System.err.println("Whoopsie! I do not actually know the command '" + command +
+					System.err.println("Whoopsie! I do not actually know the command '" + mainArg +
 						"', so I cannot offer any help with it...");
 			}
 		}
 	}
 
-	private static void showVersion() {
+	private static void showVersion(String mainArg, Map<String, String> arguments) {
 		System.out.println(Utils.getFullProgramIdentifierWithDate());
 	}
 
