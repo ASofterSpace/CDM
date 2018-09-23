@@ -84,6 +84,9 @@ public class Main {
 			case "info":
 				showInfo(lastarg, arguments);
 				break;
+			case "root":
+				showRoot(lastarg, arguments);
+				break;
 			case "tree":
 				showTree(lastarg, arguments);
 				break;
@@ -268,10 +271,69 @@ public class Main {
 		System.out.println("CDM compatible with RTF Framework CDM editor version: " + CdmCtrl.getCompatWithMCDEstr(cdmVersion, cdmPrefix));
 	}
 
+	private static void showRoot(String pathArg, Map<String, String> arguments) {
+
+		if (pathArg == null) {
+			System.err.println("You called  cdm root  but did not specify a CDM path of the CDM for which the root should be accessed - please do.");
+			System.exit(4);
+		}
+
+		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
+		// (however, not sure if the tree can be constructed from just one file... ah well, it will work out somehow ^^)
+		loadCdm(pathArg, true);
+		
+		Set<CdmMonitoringControlElement> roots = CdmCtrl.getAllMcmTreeRoots();
+		
+		if (roots.size() < 1) {
+			System.err.println("The CDM that you specified does not seem to contain an MCM tree!");
+			System.exit(12);
+		}
+		
+		String setName = "-";
+		String destinationPath = "-";
+		
+		if (arguments.containsKey("-n")) {
+			setName = arguments.get("-n");
+		}
+		
+		if (arguments.containsKey("-d")) {
+			destinationPath = arguments.get("-d");
+		}
+		
+		if ("-".equals(setName)) {
+		
+			if (!"-".equals(destinationPath)) {
+				// if they want us to save even though nothing changed... oookay xD
+				saveToDestinationPath(destinationPath, pathArg);
+			}
+		
+		} else {
+		
+			for (CdmNode node : roots) {
+				node.setName(setName);
+			}
+			
+			saveToDestinationPath(destinationPath, pathArg);
+		}
+		
+		if (roots.size() == 1) {
+			roots.iterator().next().print();
+			return;
+		}
+		
+		System.out.println(roots.size() + " different root nodes have been found in this CDM!");
+		System.out.println("Here they are:");
+		
+		for (CdmNode node : roots) {
+			System.out.println("");
+			node.print();
+		}
+	}
+	
 	private static void showTree(String pathArg, Map<String, String> arguments) {
 
 		if (pathArg == null) {
-			System.err.println("You called  cdm info  but did not specify a CDM path of the CDM for which information should be shown - please do.");
+			System.err.println("You called  cdm tree  but did not specify a CDM path of the CDM for which the tree should be accessed - please do.");
 			System.exit(4);
 		}
 
@@ -398,7 +460,18 @@ public class Main {
 				conversionTargetStr += " and CDM version " + CdmCtrl.getCdmVersion();
 			}
 		}
+		
+		saveToDestinationPath(destinationPath, pathArg);
 
+		if ("".equals(conversionTargetStr)) {
+			System.out.println("No conversion done - as I was told to keep both version and format the same! :)");
+		} else {
+			System.out.println("Conversion to " + conversionTargetStr + " done!");
+		}
+	}
+	
+	private static void saveToDestinationPath(String destinationPath, String pathArg) {
+	
 		// now actually save the result
 		if ((destinationPath == null) || ("-".equals(destinationPath))) {
 
@@ -422,12 +495,6 @@ public class Main {
 			// save the result to the new destination path
 			// TODO :: do not ignore the target format once we have more than XML available!
 			CdmCtrl.saveTo(destDir);
-		}
-
-		if ("".equals(conversionTargetStr)) {
-			System.out.println("No conversion done - as I was told to keep both version and format the same! :)");
-		} else {
-			System.out.println("Conversion to " + conversionTargetStr + " done!");
 		}
 	}
 
@@ -526,8 +593,8 @@ public class Main {
 		final String HELP_CONVERT = "convert [-f <format>] [-p <versionPrefix>] [-v <version>] [-d <destinationCdmPath>] <cdmPath> .. converts the CDM";
 		final String HELP_VALIDATE = "validate <cdmPath> .. validates the CDM";
 		final String HELP_INFO = "info <cdmPath> .. shows information about the CDM";
-		final String HELP_TREE = "tree <cdmPath> .. shows the CDM tree";
-		// TODO :: add specific command for finding the root element... maybe just  cdm root ../../  prints the root node, and  cdm root mcmRoot ../../  sets it?
+		final String HELP_ROOT = "root [-n <name>] [-d <destinationCdmPath>] <cdmPath> .. shows the root of the MCM tree";
+		final String HELP_TREE = "tree <cdmPath> .. shows the MCM tree";
 		final String HELP_FIND = "find [-u <uuid>] [-n <name>] [-t <type>] [-x <xmltag>] <cdmPath> .. finds an element in the CDM";
 		final String HELP_UUID = "uuid [-k <kind>] [<uuid>] .. generates or converts a UUID";
 		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
@@ -542,6 +609,7 @@ public class Main {
 			System.out.println("* " + HELP_CONVERT);
 			System.out.println("* " + HELP_VALIDATE);
 			System.out.println("* " + HELP_INFO);
+			System.out.println("* " + HELP_ROOT);
 			System.out.println("* " + HELP_TREE);
 			System.out.println("* " + HELP_FIND);
 			System.out.println("* " + HELP_UUID);
@@ -582,6 +650,12 @@ public class Main {
 
 				case "info":
 					System.out.println(HELP_INFO);
+					break;
+
+				case "root":
+					System.out.println(HELP_ROOT);
+					System.out.println("  If a name is selected with -n, the root element will be renamed to this name.");
+					System.out.println("  If no destination CDM path is selected using -d, then the CDM that is opened will be overwritten in-place in case the name is changed.");
 					break;
 
 				case "tree":
