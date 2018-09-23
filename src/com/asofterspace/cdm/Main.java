@@ -616,9 +616,8 @@ public class Main {
 			System.out.println("* " + HELP_VERSION);
 			System.out.println("* " + HELP_HELP);
 			// TODO :: add list commands, e.g. list parameters, list activities, list scripts, ...
-			// TODO :: add command to show the MCM tree
+			// TODO :: add command to automagically fix problems, e.g. when there is a link to a UUID that is in a different file than the link indicates, but we can fix it because the UUID is - wait for it - unique :D
 			// TODO :: add command to read a particular script, that is, get the content of that script and print it to system out
-			// TODO :: add command to rename the root node (e.g. to mcmRoot for simpler starting with default config)
 		} else {
 
 			switch (mainArg.toLowerCase()) {
