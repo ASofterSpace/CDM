@@ -594,6 +594,7 @@ public class Main {
 		final String HELP_VALIDATE = "validate <cdmPath> .. validates the CDM";
 		final String HELP_INFO = "info <cdmPath> .. shows information about the CDM";
 		final String HELP_ROOT = "root [-n <name>] [-d <destinationCdmPath>] <cdmPath> .. shows the root of the MCM tree";
+		// TODO :: optionally specify to show only MCEs (like now), or also parameters, also activities, also events, ...
 		final String HELP_TREE = "tree <cdmPath> .. shows the MCM tree";
 		final String HELP_FIND = "find [-u <uuid>] [-n <name>] [-t <type>] [-x <xmltag>] <cdmPath> .. finds an element in the CDM";
 		final String HELP_UUID = "uuid [-k <kind>] [<uuid>] .. generates or converts a UUID";
