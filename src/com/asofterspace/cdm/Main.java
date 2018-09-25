@@ -12,7 +12,6 @@ import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.utils.ProgressIndicator;
 import com.asofterspace.toolbox.utils.NoOpProgressIndicator;
-import com.asofterspace.toolbox.web.JSON;
 
 import java.util.ArrayList;
 import java.util.HashMap;
