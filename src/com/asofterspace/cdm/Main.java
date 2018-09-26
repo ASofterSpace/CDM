@@ -24,10 +24,20 @@ import java.util.Set;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.0.8(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 21. September 2018";
+	public final static String VERSION_NUMBER = "0.0.0.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 26. September 2018";
+	
+	private static String[] mainArgs;
+	private static String firstarg;
+	private static Map<String, String> arguments;
+	private static List<String> argumentList;
+	private static String pathArg;
+	private static String otherPathArg;
+
 
 	public static void main(String[] args) {
+	
+		mainArgs = args;
 
 		// let the Utils know in what program it is being used
 		Utils.setProgramTitle(PROGRAM_TITLE);
@@ -35,71 +45,46 @@ public class Main {
 		Utils.setVersionDate(VERSION_DATE);
 
 		// if we were called without arguments...
-		if (args.length < 1) {
+		if (mainArgs.length < 1) {
 			// ... tell everyone that this is basically nonsense!
-			showHelp(null, null);
+			showHelp();
 			System.exit(1);
 		}
 		
 		// get the first arg...
-		String firstarg = args[0].toLowerCase();
-		
-		// ... get a map of all modifiers ...
-		Map<String, String> arguments = new HashMap<String, String>();
-		
-		// we start at 1 (as 0 is already the firstarg), and go up to < args.length - 2,
-		// as we want to be strictly less than args.length, but one less because that is
-		// already the lastarg, if there is one
-		for (int i = 1; i < args.length - 1; i++) {
-			if (args[i].startsWith("-")) {
-				arguments.put(args[i].toLowerCase(), args[i+1]);
-				i++;
-			} else {
-				System.err.println("The argument '" + args[i] + "' was not understood - please check  cdm help " + firstarg);
-				System.exit(4);
-			}
-		}
-		
-		// ... get the last argument
-		String lastarg = null;
-		if (args.length > 1) {
-			// in the case of  cdm uuid -k ecore  we have no last arg, as we have an odd amount of arguments!
-			if (args.length % 2 == 0) {
-				lastarg = args[args.length - 1];
-			}
-		}
+		firstarg = mainArgs[0].toLowerCase();
 
 		// check all the arguments
 		switch (firstarg) {
 			case "create":
-				createCdm(lastarg, arguments);
+				createCdm();
 				break;
 			case "convert":
-				convertCdm(lastarg, arguments);
+				convertCdm();
 				break;
 			case "validate":
-				validate(lastarg, arguments);
+				validate();
 				break;
 			case "info":
-				showInfo(lastarg, arguments);
+				showInfo();
 				break;
 			case "root":
-				showRoot(lastarg, arguments);
+				showRoot();
 				break;
 			case "tree":
-				showTree(lastarg, arguments);
+				showTree();
 				break;
 			case "find":
-				findInCdm(lastarg, arguments);
+				findInCdm();
 				break;
 			case "uuid":
-				uuid(lastarg, arguments);
+				uuid();
 				break;
 			case "version":
-				showVersion(lastarg, arguments);
+				showVersion();
 				break;
 			case "help":
-				showHelp(lastarg, arguments);
+				showHelp();
 				break;
 			default:
 				System.err.println("Sorry, I did not understand the argument '" + args[0] + "' - call  cdm help  to get a list of possible commands.");
@@ -109,10 +94,63 @@ public class Main {
 		// all is shiny! all is good! exit code 0!
 		System.exit(0);
 	}
+	
+	// use a map of arguments, e.g. -u uuid -n name ..., together with at most one path in the end
+	private static void useArgMapWithOnePath() {
+		
+		// ... get a map of all modifiers ...
+		arguments = new HashMap<String, String>();
+		
+		// we start at 1 (as 0 is already the firstarg), and go up to < mainArgs.length - 1,
+		// as we want to be strictly less than mainArgs.length, but one less because that is
+		// already the lastarg, if there is one...
+		for (int i = 1; i < mainArgs.length - 1; i++) {
+			if (mainArgs[i].startsWith("-")) {
+				arguments.put(mainArgs[i].toLowerCase(), mainArgs[i+1]);
+				i++;
+			} else {
+				System.err.println("The argument '" + mainArgs[i] + "' was not understood - please check  cdm help " + firstarg);
+				System.exit(4);
+			}
+		}
+		
+		// ... get the last argument
+		if (mainArgs.length > 1) {
+			// in the case of  cdm uuid -k ecore  we have no last arg, as we have an odd amount of arguments!
+			if (mainArgs.length % 2 == 0) {
+				pathArg = mainArgs[mainArgs.length - 1];
+			}
+		}
+	}
+	
+	// use a list of arguments, e.g. -u -n ..., together with at most one path in the end
+	private static void useArgListWithOnePath() {
+		
+		// ... get a list of all modifiers ...
+		argumentList = new ArrayList<String>();
+		
+		// we start at 1 (as 0 is already the firstarg), and go up to < mainArgs.length - 1,
+		// as we want to be strictly less than mainArgs.length, but one less because that is
+		// already the lastarg, if there is one
+		for (int i = 1; i < mainArgs.length - 1; i++) {
+			if (mainArgs[i].startsWith("-")) {
+				argumentList.add(mainArgs[i].toLowerCase());
+				i++;
+			} else {
+				System.err.println("The argument '" + mainArgs[i] + "' was not understood - please check  cdm help " + firstarg);
+				System.exit(4);
+			}
+		}
+		
+		// ... get the last argument
+		if (mainArgs.length > 1) {
+			pathArg = mainArgs[mainArgs.length - 1];
+		}
+	}
 
-	private static void loadCdm(String pathArg, boolean loadFullModel) {
+	private static void loadCdm(String cdmPath, boolean loadFullModel) {
 
-		Directory cdmDir = new Directory(pathArg);
+		Directory cdmDir = new Directory(cdmPath);
 		ProgressIndicator noProgress = new NoOpProgressIndicator();
 
 		try {
@@ -127,7 +165,9 @@ public class Main {
 		}
 	}
 
-	private static void createCdm(String pathArg, Map<String, String> arguments) {
+	private static void createCdm() {
+	
+		useArgMapWithOnePath();
 
 		if (pathArg == null) {
 			System.err.println("You called  cdm create  but did not specify a CDM path at which the CDM should be created - please do.");
@@ -192,7 +232,9 @@ public class Main {
 		System.out.println("The new CDM has been created!");
 	}
 	
-	private static void findInCdm(String pathArg, Map<String, String> arguments) {
+	private static void findInCdm() {
+
+		useArgMapWithOnePath();
 
 		if (pathArg == null) {
 			System.err.println("You called  cdm find  but did not specify a CDM path to open - please do.");
@@ -252,7 +294,9 @@ public class Main {
 		}
 	}
 
-	private static void showInfo(String pathArg, Map<String, String> arguments) {
+	private static void showInfo() {
+
+		useArgMapWithOnePath();
 
 		if (pathArg == null) {
 			System.err.println("You called  cdm info  but did not specify a CDM path of the CDM for which information should be shown - please do.");
@@ -270,7 +314,9 @@ public class Main {
 		System.out.println("CDM compatible with RTF Framework CDM editor version: " + CdmCtrl.getCompatWithMCDEstr(cdmVersion, cdmPrefix));
 	}
 
-	private static void showRoot(String pathArg, Map<String, String> arguments) {
+	private static void showRoot() {
+
+		useArgMapWithOnePath();
 
 		if (pathArg == null) {
 			System.err.println("You called  cdm root  but did not specify a CDM path of the CDM for which the root should be accessed - please do.");
@@ -329,7 +375,9 @@ public class Main {
 		}
 	}
 	
-	private static void showTree(String pathArg, Map<String, String> arguments) {
+	private static void showTree() {
+
+		useArgListWithOnePath();
 
 		if (pathArg == null) {
 			System.err.println("You called  cdm tree  but did not specify a CDM path of the CDM for which the tree should be accessed - please do.");
@@ -355,18 +403,24 @@ public class Main {
 				System.out.println("");
 			}
 
-			recursivelyShowTree(root, "");
+			recursivelyShowTree(root, "", argumentList.contains("-u"));
 
 			isFirst = false;
 		}
 	}
 	
-	private static void recursivelyShowTree(CdmMonitoringControlElement mce, String prefix) {
+	private static void recursivelyShowTree(CdmMonitoringControlElement mce, String prefix, boolean showUuid) {
 		
-		System.out.println(prefix + mce.getName());
+		String curline = prefix + mce.getName();
+		
+		if (showUuid) {
+			curline += " [" + UuidEncoderDecoder.convertEcoreUUIDtoJava(mce.getId()) + "]";
+		}
+		
+		System.out.println(curline);
 		
 		for (CdmMonitoringControlElement child : mce.getSubElements()) {
-			recursivelyShowTree(child, "  " + prefix);
+			recursivelyShowTree(child, "  " + prefix, showUuid);
 		}
 	}
 
@@ -375,7 +429,9 @@ public class Main {
 	 * If destination path is null, overwrite the CDM in place.
 	 * If destination path is given, store the conversion result there.
 	 */
-	private static void convertCdm(String pathArg, Map<String, String> arguments) {
+	private static void convertCdm() {
+
+		useArgMapWithOnePath();
 
 		if (pathArg == null) {
 			System.err.println("You called  cdm create  but did not specify a CDM path at which the CDM should be created - please do.");
@@ -497,7 +553,9 @@ public class Main {
 		}
 	}
 
-	private static void validate(String pathArg, Map<String, String> arguments) {
+	private static void validate() {
+
+		useArgMapWithOnePath();
 
 		if (pathArg == null) {
 			System.err.println("You called  cdm validate  but did not specify a CDM path of the CDM that should be validated - please do.");
@@ -528,7 +586,9 @@ public class Main {
 		System.out.println("The CDM looks valid to me!");
 	}
 
-	private static void uuid(String mainArg, Map<String, String> arguments) {
+	private static void uuid() {
+
+		useArgMapWithOnePath();
 
 		String kind = "-";
 		
@@ -537,7 +597,7 @@ public class Main {
 		}
 		
 		// if no argument is given...
-		if (mainArg == null) {
+		if (pathArg == null) {
 			// ... generate a UUID
 			
 			switch (kind.toLowerCase()) {
@@ -558,13 +618,13 @@ public class Main {
 		
 		// on the other hand, if an argument is given... convert!
 	
-		UuidKind currentKind = UuidEncoderDecoder.detectUUIDkind(mainArg);
+		UuidKind currentKind = UuidEncoderDecoder.detectUUIDkind(pathArg);
 	
 		switch (kind.toLowerCase()) {
 			case "java":
 			case "-":
 				try {
-					System.out.println(UuidEncoderDecoder.ensureUUIDisJava(mainArg));
+					System.out.println(UuidEncoderDecoder.ensureUUIDisJava(pathArg));
 				} catch (ConversionException e) {
 					System.err.println(e.getMessage());
 					System.exit(11);
@@ -573,7 +633,7 @@ public class Main {
 			case "ecore":
 			case "emf":
 				try {
-					System.out.println(UuidEncoderDecoder.ensureUUIDisEcore(mainArg));
+					System.out.println(UuidEncoderDecoder.ensureUUIDisEcore(pathArg));
 				} catch (ConversionException e) {
 					System.err.println(e.getMessage());
 					System.exit(11);
@@ -586,7 +646,9 @@ public class Main {
 		}
 	}
 
-	private static void showHelp(String mainArg, Map<String, String> arguments) {
+	private static void showHelp() {
+
+		useArgMapWithOnePath();
 
 		final String HELP_CREATE = "create [-t <template>] [-f <format>] [-p <versionPrefix>] [-v <version>] <cdmPath> .. creates a new CDM";
 		final String HELP_CONVERT = "convert [-f <format>] [-p <versionPrefix>] [-v <version>] [-d <destinationCdmPath>] <cdmPath> .. converts the CDM";
@@ -594,13 +656,13 @@ public class Main {
 		final String HELP_INFO = "info <cdmPath> .. shows information about the CDM";
 		final String HELP_ROOT = "root [-n <name>] [-d <destinationCdmPath>] <cdmPath> .. shows the root of the MCM tree";
 		// TODO :: optionally specify to show only MCEs (like now), or also parameters, also activities, also events, ...
-		final String HELP_TREE = "tree <cdmPath> .. shows the MCM tree";
+		final String HELP_TREE = "tree [-u] <cdmPath> .. shows the MCM tree";
 		final String HELP_FIND = "find [-u <uuid>] [-n <name>] [-t <type>] [-x <xmltag>] <cdmPath> .. finds an element in the CDM";
 		final String HELP_UUID = "uuid [-k <kind>] [<uuid>] .. generates or converts a UUID";
 		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
 		final String HELP_HELP = "help [<command>] .. shows the help, optionally detailed help for a specific command";
 
-		if (mainArg == null) {
+		if (pathArg == null) {
 			System.out.println("Welcome to the " + Utils.getFullProgramIdentifier() + "! :)");
 			System.out.println("");
 			System.out.println("Available commands:");
@@ -620,7 +682,7 @@ public class Main {
 			// TODO :: add command to read a particular script, that is, get the content of that script and print it to system out
 		} else {
 
-			switch (mainArg.toLowerCase()) {
+			switch (pathArg.toLowerCase()) {
 
 				case "create":
 					System.out.println(HELP_CREATE);
@@ -659,6 +721,9 @@ public class Main {
 
 				case "tree":
 					System.out.println(HELP_TREE);
+					System.out.println("  Optional modifiers:");
+					System.out.println("    -u .. also show the UUID of each element in the tree");
+					// TODO :: -a to show activities, -p to show parameters, -e to show events, -* to show all (but check if that is a problem in bash!)
 					break;
 
 				case "convert":
@@ -714,13 +779,13 @@ public class Main {
 					break;
 
 				default:
-					System.err.println("Whoopsie! I do not actually know the command '" + mainArg +
+					System.err.println("Whoopsie! I do not actually know the command '" + pathArg +
 						"', so I cannot offer any help with it...");
 			}
 		}
 	}
 
-	private static void showVersion(String mainArg, Map<String, String> arguments) {
+	private static void showVersion() {
 		System.out.println(Utils.getFullProgramIdentifierWithDate());
 	}
 
