@@ -29,7 +29,6 @@ cp ../Toolbox-Java/src/com/asofterspace/toolbox/cdm/exceptions/*.* src/com/asoft
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/coders/*.* src/com/asofterspace/toolbox/coders
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/io/*.* src/com/asofterspace/toolbox/io
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils
-cp ../Toolbox-Java/src/com/asofterspace/toolbox/web/*.* src/com/asofterspace/toolbox/web
 
 rm -rf bin
 
@@ -42,3 +41,5 @@ find . -name "*.java" > sourcefiles.list
 javac -encoding utf8 -cp "../emf/*" -d ../bin @sourcefiles.list
 
 cd ..
+
+echo "Build executed!"

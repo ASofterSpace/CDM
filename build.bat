@@ -27,7 +27,6 @@ copy "..\Toolbox-Java\src\com\asofterspace\toolbox\cdm\exceptions\*.*" "src\com\
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\coders\*.*" "src\com\asofterspace\toolbox\coders"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\io\*.*" "src\com\asofterspace\toolbox\io"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\utils\*.*" "src\com\asofterspace\toolbox\utils"
-copy "..\Toolbox-Java\src\com\asofterspace\toolbox\web\*.*" "src\com\asofterspace\toolbox\web"
 
 rd /s /q bin
 
@@ -40,5 +39,7 @@ dir /s /B *.java > sourcefiles.list
 javac -encoding utf8 -cp "../emf/*" -d ../bin @sourcefiles.list
 
 cd ..
+
+echo "Build executed!"
 
 pause
