@@ -2,7 +2,9 @@
 
 **Class:** EGS-CC Tools
 
-**Language:** Java 7
+**Target Language:** Java 8 64-Bit
+
+**Minimum Supported Language:** Java 7 32-Bit
 
 **Platform:** Windows / Linux
 
@@ -10,26 +12,37 @@ A commandline tool for modifying EGS-CC CDMs
 
 ## Setup
 
-Download our Toolbox-Java (which is a separate project here on github) into an adjacent directory on your hard drive.
-
-Start the build by calling under Windows:
+1. Ensure you have a JDK (Java Development Kit) of Java 7 or higher on your machine, ideally a 64-Bit version:
 
 ```
-build.bat
+java -version
+```
+
+2. Clone this repository onto your machine:
+
+```
+git clone https://github.com/ASofterSpace/cdm.git
+cd cdm
+```
+
+3. Start the build of the latest cdm commandline tool version by calling under Windows:
+
+```
+build_latest.bat
 ```
 
 Or under Linux:
 
 ```
-./build.sh
+./build_latest.sh
 ```
 
-You then probably will also want to adjust your `PATH` variable, to add the path to the repository on your hard drive. (You don't really have to do this, but if you do not, then you always need to manually go to the cdm directory to execute the `cdm` command, and you might get tired of that. ^^)
+4. You probably will also want to adjust your `PATH` variable, to add the path to the repository on your hard drive. (You don't really have to do this, but if you do not, then you always need to manually go to the cdm directory to execute the `cdm` command, and you might get tired of that. ^^)
 
 Under Windows, assuming you have just called
 
 ```
-C:\foo\bar\cdm\build.bat
+C:\foo\bar\cdm\build_latest.bat
 ```
 
 you can go to the Control Panel, and in there System > Advanced System Settings > Environment Variables.
@@ -39,7 +52,7 @@ Finally, you might have to restart the machine for the change to take effect.
 Under Linux, assuming you have just called
 
 ```
-/foo/bar/cdm/build.sh
+/foo/bar/cdm/build_latest.sh
 ```
 
 you can edit the path variable by entering
@@ -58,7 +71,7 @@ To start up the cdm commandline tool after it has been built, you can call:
 cdm help
 ```
 
-This should work both under Windows (where cdm is expanded to cdm.bat automagically) and Linux (where the cdm shell script is executed.)
+This should work both under Windows (where `cdm` is expanded to `cdm.bat` automagically) and Linux (where the `cdm` shell script is executed.)
 
 ## License
 
