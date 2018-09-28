@@ -483,8 +483,9 @@ public class Main {
 			conversionTargetStr = format + " format";
 		}
 
-		// now attempt to load the CDM from the origin path
-		loadCdm(pathArg, false);
+		// now attempt to load the CDM from the origin path; we here need the full model, as the conversion
+		// actually in rare but existing cases needs to cross-reference things and be surprisingly smart...
+		loadCdm(pathArg, true);
 
 		// do the conversion to a different version (and possibly prefix)
 		if ("-".equals(toVersion)) {
