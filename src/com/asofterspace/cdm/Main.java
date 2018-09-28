@@ -24,8 +24,8 @@ import java.util.Set;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.0.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 26. September 2018";
+	public final static String VERSION_NUMBER = "0.0.1.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 29. September 2018";
 	
 	private static String[] mainArgs;
 	private static String firstarg;
@@ -33,6 +33,8 @@ public class Main {
 	private static List<String> argumentList;
 	private static String pathArg;
 	private static String otherPathArg;
+	
+	private static CdmCtrl cdmCtrl;
 
 
 	public static void main(String[] args) {
@@ -43,6 +45,10 @@ public class Main {
 		Utils.setProgramTitle(PROGRAM_TITLE);
 		Utils.setVersionNumber(VERSION_NUMBER);
 		Utils.setVersionDate(VERSION_DATE);
+		
+		// create one default CDM controller - we might create more later (e.g. when comparing two CDMs),
+		// but one will be plenty for now, thank you very much ;)
+		cdmCtrl = new CdmCtrl();
 
 		// if we were called without arguments...
 		if (mainArgs.length < 1) {
@@ -155,9 +161,9 @@ public class Main {
 
 		try {
 			if (loadFullModel) {
-				CdmCtrl.loadCdmDirectory(cdmDir, noProgress);
+				cdmCtrl.loadCdmDirectory(cdmDir, noProgress);
 			} else {
-				CdmCtrl.loadCdmDirectoryFaster(cdmDir, noProgress);
+				cdmCtrl.loadCdmDirectoryFaster(cdmDir, noProgress);
 			}
 		} catch (AttemptingEmfException | CdmLoadingException e) {
 			System.err.println(e.getMessage());
@@ -198,7 +204,7 @@ public class Main {
 		
 		// replace defaults
 		if ("-".equals(template)) {
-			template = CdmCtrl.getTemplates().get(0);
+			template = cdmCtrl.getTemplates().get(0);
 		}
 
 		if ("-".equals(format)) {
@@ -206,12 +212,12 @@ public class Main {
 		}
 
 		if ("-".equals(version)) {
-			version = CdmCtrl.getHighestKnownCdmVersion();
+			version = cdmCtrl.getHighestKnownCdmVersion();
 		}
 
 		// if no prefix is specified, take the correct one automagically!
 		if ("-".equals(prefix)) {
-			prefix = CdmCtrl.getPrefixForVersion(version);
+			prefix = cdmCtrl.getPrefixForVersion(version);
 			if (prefix == null) {
 				System.err.println("I do not know which prefix is associated with CDM version " + version + ".");
 				System.err.println("Please explicitly specify a prefix, e.g. call  cdm create (...) prefix:" + version + " (...)");
@@ -222,7 +228,7 @@ public class Main {
 		// actually perform the work
 		try {
 			// TODO :: do not ignore the formate ;)
-			CdmCtrl.createNewCdm(pathArg, version, prefix, template);
+			cdmCtrl.createNewCdm(pathArg, version, prefix, template);
 			
 		} catch (AttemptingEmfException | CdmLoadingException e) {
 			System.err.println(e.getMessage());
@@ -259,22 +265,22 @@ public class Main {
 				System.err.println(e.getMessage());
 				System.exit(11);
 			}
-			nodesFound.addAll(CdmCtrl.findByUuid(uuid));
+			nodesFound.addAll(cdmCtrl.findByUuid(uuid));
 		}
 		
 		// find by name
 		if (arguments.containsKey("-n")) {
-			nodesFound.addAll(CdmCtrl.findByName(arguments.get("-n")));
+			nodesFound.addAll(cdmCtrl.findByName(arguments.get("-n")));
 		}
 		
 		// find by type
 		if (arguments.containsKey("-t")) {
-			nodesFound.addAll(CdmCtrl.findByType(arguments.get("-t")));
+			nodesFound.addAll(cdmCtrl.findByType(arguments.get("-t")));
 		}
 		
 		// find by xml tag
 		if (arguments.containsKey("-x")) {
-			nodesFound.addAll(CdmCtrl.findByXmlTag(arguments.get("-x")));
+			nodesFound.addAll(cdmCtrl.findByXmlTag(arguments.get("-x")));
 		}
 		
 		if (nodesFound.size() == 0) {
@@ -306,12 +312,12 @@ public class Main {
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
 		loadCdm(pathArg, false);
 
-		String cdmVersion = CdmCtrl.getCdmVersion();
-		String cdmPrefix = CdmCtrl.getCdmVersionPrefix();
+		String cdmVersion = cdmCtrl.getCdmVersion();
+		String cdmPrefix = cdmCtrl.getCdmVersionPrefix();
 		System.out.println("CDM version: " + cdmVersion);
 		System.out.println("CDM version prefix: " + cdmPrefix);
-		System.out.println("CDM compatible with EGS-CC release: " + CdmCtrl.getCompatWithEGSCCstr(cdmVersion, cdmPrefix));
-		System.out.println("CDM compatible with RTF Framework CDM editor version: " + CdmCtrl.getCompatWithMCDEstr(cdmVersion, cdmPrefix));
+		System.out.println("CDM compatible with EGS-CC release: " + cdmCtrl.getCompatWithEGSCCstr(cdmVersion, cdmPrefix));
+		System.out.println("CDM compatible with RTF Framework CDM editor version: " + cdmCtrl.getCompatWithMCDEstr(cdmVersion, cdmPrefix));
 	}
 
 	private static void showRoot() {
@@ -327,7 +333,7 @@ public class Main {
 		// (however, not sure if the tree can be constructed from just one file... ah well, it will work out somehow ^^)
 		loadCdm(pathArg, true);
 		
-		Set<CdmMonitoringControlElement> roots = CdmCtrl.getAllMcmTreeRoots();
+		Set<CdmMonitoringControlElement> roots = cdmCtrl.getAllMcmTreeRoots();
 		
 		if (roots.size() < 1) {
 			System.err.println("The CDM that you specified does not seem to contain an MCM tree!");
@@ -388,7 +394,7 @@ public class Main {
 		// (however, not sure if the tree can be constructed from just one file... ah well, it will work out somehow ^^)
 		loadCdm(pathArg, true);
 		
-		Set<CdmMonitoringControlElement> roots = CdmCtrl.getAllMcmTreeRoots();
+		Set<CdmMonitoringControlElement> roots = cdmCtrl.getAllMcmTreeRoots();
 		
 		if (roots.size() < 1) {
 			System.err.println("The CDM that you specified does not seem to contain an MCM tree!");
@@ -499,7 +505,7 @@ public class Main {
 		// if no prefix is specified, take the correct one automagically!
 		// (however, if the target version is null - so kept the same - then the prefix can also be null - also be kept the same)
 		if ((toPrefix == null) && (toVersion != null)) {
-			toPrefix = CdmCtrl.getPrefixForVersion(toVersion);
+			toPrefix = cdmCtrl.getPrefixForVersion(toVersion);
 			if (toPrefix == null) {
 				System.err.println("I do not know which prefix is associated with CDM version " + toVersion + ".");
 				System.err.println("Please explicitly specify a prefix (even '-' would be enough to keep the current one), e.g. call  cdm convert -:" + toVersion + " (...)");
@@ -508,12 +514,12 @@ public class Main {
 		}
 
 		if ((toPrefix != null) || (toVersion != null)) {
-			CdmCtrl.convertTo(toVersion, toPrefix);
+			cdmCtrl.convertTo(toVersion, toPrefix);
 
 			if ("".equals(conversionTargetStr)) {
-				conversionTargetStr = "CDM version " + CdmCtrl.getCdmVersion();
+				conversionTargetStr = "CDM version " + cdmCtrl.getCdmVersion();
 			} else {
-				conversionTargetStr += " and CDM version " + CdmCtrl.getCdmVersion();
+				conversionTargetStr += " and CDM version " + cdmCtrl.getCdmVersion();
 			}
 		}
 		
@@ -533,7 +539,7 @@ public class Main {
 
 			// overwrite the original with the new result
 			// TODO :: do not ignore the target format once we have more than XML available!
-			CdmCtrl.save();
+			cdmCtrl.save();
 
 		} else {
 
@@ -550,7 +556,7 @@ public class Main {
 
 			// save the result to the new destination path
 			// TODO :: do not ignore the target format once we have more than XML available!
-			CdmCtrl.saveTo(destDir);
+			cdmCtrl.saveTo(destDir);
 		}
 	}
 
@@ -568,7 +574,7 @@ public class Main {
 
 		List<String> problems = new ArrayList<>();
 
-		int problemAmount = CdmCtrl.checkValidity(problems);
+		int problemAmount = cdmCtrl.checkValidity(problems);
 
 		if (problemAmount > 0) {
 			System.err.println("The CDM does not seem to be valid.");
@@ -689,8 +695,8 @@ public class Main {
 					System.out.println(HELP_CREATE);
 					System.out.println("");
 					System.out.println("  Available templates for -t are:");
-					List<String> templates = CdmCtrl.getTemplates();
-					List<String> templatesShort = CdmCtrl.getTemplatesShort();
+					List<String> templates = cdmCtrl.getTemplates();
+					List<String> templatesShort = cdmCtrl.getTemplatesShort();
 					for (int i = 0; i < templates.size(); i++) {
 						System.out.println("    " + templatesShort.get(i) + " .. " + templates.get(i));
 					}
@@ -704,10 +710,10 @@ public class Main {
 					System.out.println("  The version prefix for -p is automatically selected based on the version; only select it manually if you really have to.");
 					System.out.println("");
 					System.out.println("  Supported versions for -v are:");
-					for (String ver : CdmCtrl.getKnownCdmVersions()) {
+					for (String ver : cdmCtrl.getKnownCdmVersions()) {
 						System.out.println("    " + ver);
 					}
-					System.out.println("    - .. default: highest available version (" + CdmCtrl.getHighestKnownCdmVersion() + ")");
+					System.out.println("    - .. default: highest available version (" + cdmCtrl.getHighestKnownCdmVersion() + ")");
 					break;
 
 				case "info":
@@ -738,7 +744,7 @@ public class Main {
 					System.out.println("  The version prefix for -p is automatically selected based on the version; only select it manually if you really have to.");
 					System.out.println("");
 					System.out.println("  Supported target versions for -v are:");
-					for (String ver : CdmCtrl.getKnownCdmVersions()) {
+					for (String ver : cdmCtrl.getKnownCdmVersions()) {
 						System.out.println("    " + ver);
 					}
 					System.out.println("    - .. default: keep the current version");
