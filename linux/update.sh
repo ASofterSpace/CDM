@@ -1,8 +1,10 @@
 #!/bin/bash
 
+echo "Pulling the latest changes..."
+
 git pull
 
-cd ..
+cd ../..
 
 if [[ ! -d ./Toolbox-Java ]]; then
 	git clone https://github.com/ASofterSpace/Toolbox-Java.git
@@ -12,8 +14,4 @@ cd Toolbox-Java
 
 git pull
 
-cd ..
-
-cd cdm
-
-./build.sh
+cd ../cdm/linux

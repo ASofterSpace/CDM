@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ..
+
 if [[ ! -d ../Toolbox-Java ]]; then
 	echo "It looks like you did not yet get the Toolbox-Java project - please do so (and put it as a folder next to the CDM Script Editor folder.)"
 	exit
@@ -19,7 +21,6 @@ cd ..
 mkdir coders
 mkdir io
 mkdir utils
-mkdir web
 
 cd ../../../..
 
@@ -43,3 +44,6 @@ javac -encoding utf8 -cp "../emf/*" -d ../bin @sourcefiles.list
 cd ..
 
 echo "Build executed!"
+
+cd linux
+
