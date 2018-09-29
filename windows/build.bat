@@ -1,3 +1,7 @@
+@echo off
+
+cd ..
+
 IF NOT EXIST ..\Toolbox-Java\ (
 	echo "It looks like you did not yet get the Toolbox-Java project - please do so (and put it as a folder next to the CDM Script Editor folder.)"
 	EXIT
@@ -17,7 +21,6 @@ cd ..
 md coders
 md io
 md utils
-md web
 
 cd ..\..\..\..
 
@@ -40,6 +43,8 @@ javac -encoding utf8 -cp "../emf/*" -d ../bin @sourcefiles.list
 
 cd ..
 
-echo "Build executed!"
+echo Build executed!
+
+cd windows
 
 pause
