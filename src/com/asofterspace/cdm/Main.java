@@ -24,8 +24,8 @@ import java.util.Set;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.1.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 29. September 2018";
+	public final static String VERSION_NUMBER = "0.0.1.1beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 30. September 2018";
 	
 	private static String[] mainArgs;
 	private static String firstarg;
@@ -58,10 +58,23 @@ public class Main {
 		}
 		
 		// get the first arg...
-		firstarg = mainArgs[0].toLowerCase();
+		firstarg = mainArgs[0];
+		
+		String firstargCompare = firstarg.trim().toLowerCase();
+		
+		while (firstargCompare.startsWith("-")) {
+			firstargCompare = firstargCompare.substring(1);
+		}
 
 		// check all the arguments
-		switch (firstarg) {
+		switch (firstargCompare) {
+			/*
+			// TODO :: this will become necessary if we cannot significantly speed up XML CDM loading...
+			// if even loading a 250 MB CDM takes a second or less, then this is not necessary!
+			case "interactive":
+				startInteractiveSession();
+				break;
+			*/
 			case "create":
 				createCdm();
 				break;
@@ -69,7 +82,10 @@ public class Main {
 				convertCdm();
 				break;
 			case "validate":
-				validate();
+				validateCdm();
+				break;
+			case "compare":
+				compareCdms();
 				break;
 			case "info":
 				showInfo();
@@ -154,16 +170,48 @@ public class Main {
 		}
 	}
 
+	// use a list of arguments, e.g. -u -n ..., together with at most two paths in the end
+	private static void useArgListWithTwoPaths() {
+		
+		// ... get a list of all modifiers ...
+		argumentList = new ArrayList<String>();
+		
+		// we start at 1 (as 0 is already the firstarg), and go up to < mainArgs.length - 2,
+		// as we want to be strictly less than mainArgs.length, but two less because those are
+		// already the lastargs, if they are there
+		for (int i = 1; i < mainArgs.length - 2; i++) {
+			if (mainArgs[i].startsWith("-")) {
+				argumentList.add(mainArgs[i].toLowerCase());
+				i++;
+			} else {
+				System.err.println("The argument '" + mainArgs[i] + "' was not understood - please check  cdm help " + firstarg);
+				System.exit(4);
+			}
+		}
+		
+		// ... get the last arguments
+		if (mainArgs.length > 1) {
+			pathArg = mainArgs[mainArgs.length - 1];
+		}
+		if (mainArgs.length > 2) {
+			otherPathArg = mainArgs[mainArgs.length - 2];
+		}
+	}
+	
 	private static void loadCdm(String cdmPath, boolean loadFullModel) {
+		loadCdm(cdmPath, loadFullModel, cdmCtrl);
+	}
+
+	private static void loadCdm(String cdmPath, boolean loadFullModel, CdmCtrl cdmCtrlToLoadInto) {
 
 		Directory cdmDir = new Directory(cdmPath);
 		ProgressIndicator noProgress = new NoOpProgressIndicator();
 
 		try {
 			if (loadFullModel) {
-				cdmCtrl.loadCdmDirectory(cdmDir, noProgress);
+				cdmCtrlToLoadInto.loadCdmDirectory(cdmDir, noProgress);
 			} else {
-				cdmCtrl.loadCdmDirectoryFaster(cdmDir, noProgress);
+				cdmCtrlToLoadInto.loadCdmDirectoryFaster(cdmDir, noProgress);
 			}
 		} catch (AttemptingEmfException | CdmLoadingException e) {
 			System.err.println(e.getMessage());
@@ -560,7 +608,7 @@ public class Main {
 		}
 	}
 
-	private static void validate() {
+	private static void validateCdm() {
 
 		useArgMapWithOnePath();
 
@@ -591,6 +639,41 @@ public class Main {
 		}
 
 		System.out.println("The CDM looks valid to me!");
+	}
+
+	private static void compareCdms() {
+
+		useArgListWithTwoPaths();
+
+		if (pathArg == null) {
+			System.err.println("You called  cdm compare  but did not specify any CDM path of the CDMs that should be validated - please do.");
+			System.exit(4);
+		}
+		
+		if (otherPathArg == null) {
+			System.err.println("You called  cdm compare  but did not specify a second CDM path of the second CDM that should be compared to the first one - please do.");
+			System.exit(4);
+		}
+		
+		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
+		loadCdm(pathArg, false, cdmCtrl);
+		
+		CdmCtrl otherCdmCtrl = new CdmCtrl();
+		
+		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
+		loadCdm(otherPathArg, false, otherCdmCtrl);
+		
+		List<String> differences = cdmCtrl.findDifferencesFrom(otherCdmCtrl);
+		
+		if (differences.size() < 1) {
+			System.out.println("No differences have been found between the two CDMs!");
+			return;
+		}
+
+		System.out.println("The following differences have been found:");
+		for (String difference : differences) {
+			System.out.println(difference);
+		}
 	}
 
 	private static void uuid() {
@@ -659,6 +742,7 @@ public class Main {
 
 		final String HELP_CREATE = "create [-t <template>] [-f <format>] [-p <versionPrefix>] [-v <version>] <cdmPath> .. creates a new CDM";
 		final String HELP_CONVERT = "convert [-f <format>] [-p <versionPrefix>] [-v <version>] [-d <destinationCdmPath>] <cdmPath> .. converts the CDM";
+		final String HELP_COMPARE = "compare <leftCdmPath> <rightCdmPath> .. compares the CDMs";
 		final String HELP_VALIDATE = "validate <cdmPath> .. validates the CDM";
 		final String HELP_INFO = "info <cdmPath> .. shows information about the CDM";
 		final String HELP_ROOT = "root [-n <name>] [-d <destinationCdmPath>] <cdmPath> .. shows the root of the MCM tree";
@@ -676,6 +760,7 @@ public class Main {
 			System.out.println("");
 			System.out.println("* " + HELP_CREATE);
 			System.out.println("* " + HELP_CONVERT);
+			System.out.println("* " + HELP_COMPARE);
 			System.out.println("* " + HELP_VALIDATE);
 			System.out.println("* " + HELP_INFO);
 			System.out.println("* " + HELP_ROOT);
@@ -714,6 +799,10 @@ public class Main {
 						System.out.println("    " + ver);
 					}
 					System.out.println("    - .. default: highest available version (" + cdmCtrl.getHighestKnownCdmVersion() + ")");
+					break;
+
+				case "compare":
+					System.out.println(HELP_COMPARE);
 					break;
 
 				case "info":
