@@ -22,20 +22,19 @@ java -version
 
 ```
 git clone https://github.com/ASofterSpace/cdm.git
-cd cdm
 ```
 
 3. Start the build of the latest cdm commandline tool version by calling under Windows:
 
 ```
-cd windows
+cd cdm\windows
 install_latest.bat
 ```
 
 Or under Linux:
 
 ```
-cd linux
+cd cdm/linux
 ./install_latest.sh
 ```
 
