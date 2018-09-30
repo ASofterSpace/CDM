@@ -10,6 +10,10 @@
 
 A commandline tool for modifying EGS-CC CDMs
 
+## Manual
+
+The official manual for this tool can be found [here](http://asofterspace.com/cdm/manual.pdf).
+
 ## Setup
 
 1. Ensure you have a JDK (Java Development Kit) of Java 7 or higher on your machine, ideally a 64-Bit version:
@@ -52,9 +56,11 @@ cdm help
 
 This should work both under Windows (where `cdm` is expanded to `cdm.bat` automagically) and Linux (where the `cdm` shell script is executed.)
 
-## License
+## License and Support
 
 We at A Softer Space really love the Unlicense, which pretty much allows anyone to do anything with this source code.
 For more info, see the file UNLICENSE.
 
 If you desperately need to use this source code under a different license, [contact us](mailto:moya@asofterspace.com) - I am sure we can figure something out.
+
+Finally, if you like this tool and would be happy for it to be developed further, for bugs that you find to be fixed, and even for new features that you have in mind to be added, then just let us know and we will offer you a service contract at such great conditions that you cannot possibly say no to it. :)
