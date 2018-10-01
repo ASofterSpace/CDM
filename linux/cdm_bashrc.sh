@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # adjust path to access CDM from anywhere
-export PATH=$PATH:`dirname "$0"`/..
+CDMDIR="$( dirname "${BASH_SOURCE[0]}" )"
+CDMDIR="$( cd $CDMDIR/.. && pwd )"
+export PATH=$PATH:$CDMDIR
 
 # add autocompletion
 _autocomplete_cdm()
