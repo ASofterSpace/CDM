@@ -15,4 +15,4 @@ echo "%PATH%" | findstr /i %ASSCDMFIND% >nul && echo "Already registered in sess
 
 echo "Building the cdm commandline tool..."
 
-REM  "build.bat"
+"build.bat"
