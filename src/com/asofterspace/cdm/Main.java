@@ -24,8 +24,8 @@ import java.util.Set;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.1.1beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 30. September 2018";
+	public final static String VERSION_NUMBER = "0.0.1.2beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 4. October 2018";
 	
 	private static String[] mainArgs;
 	private static String firstarg;
