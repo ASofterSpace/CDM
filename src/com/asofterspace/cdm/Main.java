@@ -45,6 +45,8 @@ public class Main {
 		Utils.setProgramTitle(PROGRAM_TITLE);
 		Utils.setVersionNumber(VERSION_NUMBER);
 		Utils.setVersionDate(VERSION_DATE);
+
+		// Utils.debuglog("Starting up...");
 		
 		// create one default CDM controller - we might create more later (e.g. when comparing two CDMs),
 		// but one will be plenty for now, thank you very much ;)
@@ -112,6 +114,8 @@ public class Main {
 				System.err.println("Sorry, I did not understand the argument '" + args[0] + "' - call  cdm help  to get a list of possible commands.");
 				System.exit(2);
 		}
+
+		// Utils.debuglog("Done!");
 
 		// all is shiny! all is good! exit code 0!
 		System.exit(0);
