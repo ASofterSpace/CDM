@@ -10,7 +10,7 @@ _autocomplete_cdm()
 {
 	local proposal
 	local all_commands
-	all_commands="compare convert create find help info interactive root tree uuid validate version"
+	all_commands="compare convert create find help info interactive print root tree uuid validate version"
 
 	if [[ $COMP_CWORD -eq 1 ]]; then
 		# complete the command argument
