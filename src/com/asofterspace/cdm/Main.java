@@ -24,8 +24,8 @@ import java.util.Set;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.1.2beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 4. October 2018";
+	public final static String VERSION_NUMBER = "0.0.1.3beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 7. October 2018";
 	
 	private static String[] mainArgs;
 	private static String firstarg;
@@ -100,6 +100,9 @@ public class Main {
 				break;
 			case "find":
 				findInCdm();
+				break;
+			case "print":
+				printCdm();
 				break;
 			case "uuid":
 				uuid();
@@ -203,10 +206,10 @@ public class Main {
 	}
 	
 	private static void loadCdm(String cdmPath, boolean loadFullModel) {
-		loadCdm(cdmPath, loadFullModel, cdmCtrl);
+		loadCdm(cdmPath, loadFullModel, cdmCtrl, true);
 	}
 
-	private static void loadCdm(String cdmPath, boolean loadFullModel, CdmCtrl cdmCtrlToLoadInto) {
+	private static void loadCdm(String cdmPath, boolean loadFullModel, CdmCtrl cdmCtrlToLoadInto, boolean exitOnProblem) {
 
 		Directory cdmDir = new Directory(cdmPath);
 		ProgressIndicator noProgress = new NoOpProgressIndicator();
@@ -219,7 +222,9 @@ public class Main {
 			}
 		} catch (AttemptingEmfException | CdmLoadingException e) {
 			System.err.println(e.getMessage());
-			System.exit(3);
+			if (exitOnProblem) {
+				System.exit(3);
+			}
 		}
 	}
 
@@ -289,7 +294,7 @@ public class Main {
 		
 		System.out.println("The new CDM has been created!");
 	}
-	
+
 	private static void findInCdm() {
 
 		useArgMapWithOnePath();
@@ -350,6 +355,22 @@ public class Main {
 			System.out.println("");
 			node.print();
 		}
+	}
+
+	private static void printCdm() {
+
+		useArgMapWithOnePath();
+
+		if (pathArg == null) {
+			System.err.println("You called  cdm print  but did not specify a CDM path to open - please do.");
+			System.exit(4);
+		}
+
+		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
+		loadCdm(pathArg, false, cdmCtrl, false);
+
+		cdmCtrl.debugPrintAll();
+
 	}
 
 	private static void showInfo() {
@@ -660,12 +681,12 @@ public class Main {
 		}
 		
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
-		loadCdm(pathArg, false, cdmCtrl);
+		loadCdm(pathArg, false, cdmCtrl, true);
 		
 		CdmCtrl otherCdmCtrl = new CdmCtrl();
 		
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
-		loadCdm(otherPathArg, false, otherCdmCtrl);
+		loadCdm(otherPathArg, false, otherCdmCtrl, true);
 		
 		List<String> differences = cdmCtrl.findDifferencesFrom(otherCdmCtrl);
 		
@@ -753,6 +774,7 @@ public class Main {
 		// TODO :: optionally specify to show only MCEs (like now), or also parameters, also activities, also events, ...
 		final String HELP_TREE = "tree [-u] <cdmPath> .. shows the MCM tree";
 		final String HELP_FIND = "find [-u <uuid>] [-n <name>] [-t <type>] [-x <xmltag>] <cdmPath> .. finds an element in the CDM";
+		final String HELP_PRINT = "print <cdmPath> .. prints the contents of the CDM as XML";
 		final String HELP_UUID = "uuid [-k <kind>] [<uuid>] .. generates or converts a UUID";
 		final String HELP_VERSION = "version .. shows the version of the " + PROGRAM_TITLE;
 		final String HELP_HELP = "help [<command>] .. shows the help, optionally detailed help for a specific command";
@@ -770,6 +792,7 @@ public class Main {
 			System.out.println("* " + HELP_ROOT);
 			System.out.println("* " + HELP_TREE);
 			System.out.println("* " + HELP_FIND);
+			System.out.println("* " + HELP_PRINT);
 			System.out.println("* " + HELP_UUID);
 			System.out.println("* " + HELP_VERSION);
 			System.out.println("* " + HELP_HELP);
@@ -856,6 +879,12 @@ public class Main {
 					System.out.println("  -n name .. if specified, find an element by its name");
 					System.out.println("  -t type .. if specified, find an element by its xsi type");
 					System.out.println("  -x xmltag .. if specified, find an element by its xml tag");
+					break;
+
+				case "print":
+					System.out.println(HELP_PRINT);
+					System.out.println("This is mostly used for debug purposes, to quickly see whether a (small!) EMF binary CDM was understood and correctly parsed or not.");
+					System.out.println("Think of this as a shorthand for converting the CDM to its XML representation and printing the resulting file contents to the console.");
 					break;
 
 				case "uuid":
