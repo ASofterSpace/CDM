@@ -14,12 +14,58 @@ A commandline tool for modifying EGS-CC CDMs
 
 The official manual for this tool can be found [here](http://asofterspace.com/cdm/manual.pdf).
 
-## Setup
+## Default Setup
 
-1. Ensure you have a JDK (Java Development Kit) of Java 7 or higher on your machine, ideally a 64-Bit version:
+To set up the cdm commandline tool you can just download a zip file, call a setup script, and it should start working.
+
+In particular, you can download the latest zip from [here](http://asofterspace.com/cdm/cdm.zip).
+
+To run the cdm commandline tool on your computer, you need to install Java on it.
+(Any JRE or JVM of Java 7 or higher will be sufficient; for using very large CDM files, a 64-Bit version will be necessary.)
+
+To check that you have Java installed, you can type in a terminal:
 
 ```
 java -version
+```
+
+Once Java is found, unzip the cdm commandline tool file, e.g. under Linux by typing:
+
+```
+unzip cdm.zip
+```
+
+Finally, to register the cdm command with your terminal, call under Windows:
+
+```
+cd cdm\windows
+install_from_zip.bat
+```
+
+Or under Linux:
+
+```
+cd cdm/linux
+./install_from_zip.sh
+```
+
+The `cdm` command will now be available in the current terminal session.
+
+Especially under Windows, it might be necessary to restart the machine before it also becomes available in other terminal sessions.
+
+
+## Setup using Manual Build
+
+1. Ensure you have a JDK (Java Development Kit) of Java 7 or higher on your machine, ideally a 64-Bit version, and that `javac` is on your current `PATH`:
+
+```
+java -version
+```
+
+and
+
+```
+javac -version
 ```
 
 2. Clone this repository onto your machine:
@@ -45,6 +91,23 @@ cd cdm/linux
 The `cdm` command will now be available in the current terminal session.
 
 Especially under Windows, it might be necessary to restart the machine before it also becomes available in other terminal sessions.
+
+### Creating a Release
+
+Should you want to create a zip release of what you just built, then you have to get your hands on a Java 7 `rt.jar` (such that the released zip can be created in a way compatible with Java 7 and above.)
+Once you have it, put this file at the location:
+
+```
+cdm/other/java7_rt.jar
+```
+
+Then, under Linux you can call:
+
+```
+./release.sh
+```
+
+(from the same directory in which you also executed the `./install_latest.sh` command.)
 
 ## Run
 
