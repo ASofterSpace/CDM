@@ -1,5 +1,7 @@
 @echo off
 
+echo "Building the cdm commandline tool..."
+
 cd ..
 
 IF NOT EXIST ..\Toolbox-Java\ (

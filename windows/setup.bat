@@ -12,7 +12,3 @@ echo "%PATH%" | findstr /i %ASSCDMFIND% >nul && echo "Already registered in envi
 REM set the PATH environment variable also for the remainder of this cmd session
 echo "%PATH%" | findstr /i %ASSCDMFIND% >nul && echo "Already registered in session variable" || set PATH=%PATH%;%ASSCDM%
 
-
-echo "Building the cdm commandline tool..."
-
-"build.bat"

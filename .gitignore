@@ -41,3 +41,8 @@ src/com/asofterspace/toolbox
 
 # config files
 config
+
+# prepared release files
+release
+cdm.zip
+

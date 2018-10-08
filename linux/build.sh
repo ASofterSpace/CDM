@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Building the cdm commandline tool..."
+
 cd ..
 
 if [[ ! -d ../Toolbox-Java ]]; then

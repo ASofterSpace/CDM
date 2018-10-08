@@ -2,4 +2,7 @@
 
 call "update.bat"
 
-"setup.bat"
+call "setup.bat"
+
+call "build.bat"
+

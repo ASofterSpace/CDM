@@ -9,8 +9,3 @@ grep -qF -- "$bashrcLine" ~/.bashrc || echo "$bashrcLine" >> ~/.bashrc
 # also adjust the path right now, not just after a terminal restart
 ./cdm_bashrc.sh
 
-
-echo "Building the cdm commandline tool..."
-
-./build.sh
-
