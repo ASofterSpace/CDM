@@ -11,6 +11,7 @@ import com.asofterspace.cdm.commands.Find;
 import com.asofterspace.cdm.commands.Print;
 import com.asofterspace.cdm.commands.Uuid;
 import com.asofterspace.cdm.commands.Version;
+import com.asofterspace.cdm.commands.VersionForZip;
 import com.asofterspace.cdm.commands.Help;
 import com.asofterspace.toolbox.Utils;
 
@@ -42,6 +43,7 @@ public class Main {
 		CommandCtrl.register(new Print());
 		CommandCtrl.register(new Uuid());
 		CommandCtrl.register(new Version());
+		CommandCtrl.register(new VersionForZip());
 		CommandCtrl.register(new Help());
 
 		// TODO :: add interactive command to have an interactive session...
