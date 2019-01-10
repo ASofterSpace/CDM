@@ -18,8 +18,8 @@ import com.asofterspace.toolbox.Utils;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.1.4beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 8. October 2018";
+	public final static String VERSION_NUMBER = "0.0.1.5beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 10. January 2019";
 
 
 	public static void main(String[] args) {
@@ -54,7 +54,7 @@ public class Main {
 		// TODO :: add command to read a particular script, that is, get the content of that script and print it to system out
 
 		CommandCtrl.executeCommand(args);
-		
+
 		// Utils.debuglog("Done!");
 
 		// all is shiny! all is good! exit code 0!
@@ -62,4 +62,3 @@ public class Main {
 	}
 
 }
-

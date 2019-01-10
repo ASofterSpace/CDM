@@ -26,7 +26,7 @@ public class Validate implements Command {
 			System.err.println("You called  cdm validate  but did not specify a CDM path of the CDM that should be validated - please do.");
 			System.exit(4);
 		}
-		
+
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
 		CommandCtrl.loadCdm();
 
@@ -36,6 +36,7 @@ public class Validate implements Command {
 
 		if (problemAmount > 0) {
 			System.err.println("The CDM does not seem to be valid.");
+			System.err.println("");
 			if (problemAmount == 1) {
 				System.err.println("There is one problem:");
 			} else {
@@ -61,4 +62,3 @@ public class Validate implements Command {
 		return null;
 	}
 }
-
