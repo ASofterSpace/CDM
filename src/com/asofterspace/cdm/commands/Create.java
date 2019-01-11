@@ -1,3 +1,7 @@
+/**
+ * Unlicensed code created by A Softer Space, 2019
+ * www.asofterspace.com/licenses/unlicense.txt
+ */
 package com.asofterspace.cdm.commands;
 
 import com.asofterspace.cdm.CommandCtrl;
@@ -131,4 +135,3 @@ public class Create implements Command {
 		return result;
 	}
 }
-

@@ -1,3 +1,7 @@
+/**
+ * Unlicensed code created by A Softer Space, 2019
+ * www.asofterspace.com/licenses/unlicense.txt
+ */
 package com.asofterspace.cdm.commands;
 
 import com.asofterspace.cdm.CommandCtrl;
@@ -32,7 +36,10 @@ public class Help implements Command {
 			List<Command> commands = CommandCtrl.getRegisteredCommands();
 
 			for (Command command : commands) {
-				System.out.println("* " + command.getShortHelp());
+				// ignore commands that do not want to be shown in the shortlist
+				if (command.getShortHelp() != null) {
+					System.out.println("* " + command.getShortHelp());
+				}
 			}
 
 		} else {
@@ -49,7 +56,11 @@ public class Help implements Command {
 
 			if (helpStrs == null) {
 
-				System.out.println(command.getShortHelp());
+				if (command.getShortHelp() == null) {
+					System.out.println("For this command, no further help is available.");
+				} else {
+					System.out.println(command.getShortHelp());
+				}
 
 			} else {
 
@@ -70,4 +81,3 @@ public class Help implements Command {
 		return null;
 	}
 }
-
