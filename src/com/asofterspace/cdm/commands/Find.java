@@ -39,10 +39,10 @@ public class Find implements Command {
 		}
 
 		// TODO :: if this is just one file (e.g. toLowerCase() ends on .cdm) then actually just load that one file instead!
-		CommandCtrl.loadCdm(false);
+		CommandCtrl.loadCdm(true);
 
 		CdmCtrl cdmCtrl = CommandCtrl.getCdmCtrl();
-		
+
 		Set<CdmNode> nodesFound = new HashSet<>();
 
 		// TODO :: add another switch that allows searching only for elements that have this AND that instead of this OR that
@@ -52,8 +52,14 @@ public class Find implements Command {
 		Map<String, String> arguments = CommandCtrl.getArgumentMap();
 
 		// find by UUID
+		String uuid = null;
 		if (arguments.containsKey("-u")) {
-			String uuid = arguments.get("-u");
+			uuid = arguments.get("-u");
+		}
+		if (arguments.containsKey("-uuid")) {
+			uuid = arguments.get("-uuid");
+		}
+		if (uuid != null) {
 			try {
 				uuid = UuidEncoderDecoder.ensureUUIDisEcore(uuid);
 			} catch (ConversionException e) {
@@ -62,33 +68,42 @@ public class Find implements Command {
 			}
 			nodesFound.addAll(cdmCtrl.findByUuid(uuid));
 		}
-		
+
 		// find by name
 		if (arguments.containsKey("-n")) {
 			nodesFound.addAll(cdmCtrl.findByName(arguments.get("-n")));
 		}
-		
+		if (arguments.containsKey("-name")) {
+			nodesFound.addAll(cdmCtrl.findByName(arguments.get("-name")));
+		}
+
 		// find by type
 		if (arguments.containsKey("-t")) {
 			nodesFound.addAll(cdmCtrl.findByType(arguments.get("-t")));
 		}
-		
+		if (arguments.containsKey("-type")) {
+			nodesFound.addAll(cdmCtrl.findByType(arguments.get("-type")));
+		}
+
 		// find by xml tag
 		if (arguments.containsKey("-x")) {
 			nodesFound.addAll(cdmCtrl.findByXmlTag(arguments.get("-x")));
 		}
-		
+		if (arguments.containsKey("-xml")) {
+			nodesFound.addAll(cdmCtrl.findByXmlTag(arguments.get("-xml")));
+		}
+
 		if (nodesFound.size() == 0) {
 			System.out.println("No entities have been found, sorry.");
 			return;
 		}
-		
+
 		if (nodesFound.size() == 1) {
 			System.out.println("1 entity has been found:");
 		} else {
 			System.out.println(nodesFound.size() + " entities have been found:");
 		}
-		
+
 		for (CdmNode node : nodesFound) {
 			System.out.println("");
 			node.print();
@@ -111,6 +126,12 @@ public class Find implements Command {
 		result.add("  -n name .. if specified, find an element by its name");
 		result.add("  -t type .. if specified, find an element by its xsi type");
 		result.add("  -x xmltag .. if specified, find an element by its xml tag");
+		result.add("");
+		result.add("  longer alternatives (which are doing the same) are:");
+		result.add("  -uuid UUID");
+		result.add("  -name name");
+		result.add("  -type type");
+		result.add("  -xml xmltag");
 
 		return result;
 	}
