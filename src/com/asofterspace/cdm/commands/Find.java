@@ -77,6 +77,14 @@ public class Find implements Command {
 			nodesFound.addAll(cdmCtrl.findByName(arguments.get("-name")));
 		}
 
+		// find by path
+		if (arguments.containsKey("-p")) {
+			nodesFound.addAll(cdmCtrl.findByPath(arguments.get("-p")));
+		}
+		if (arguments.containsKey("-path")) {
+			nodesFound.addAll(cdmCtrl.findByPath(arguments.get("-path")));
+		}
+
 		// find by type
 		if (arguments.containsKey("-t")) {
 			nodesFound.addAll(cdmCtrl.findByType(arguments.get("-t")));
@@ -124,12 +132,14 @@ public class Find implements Command {
 		result.add("");
 		result.add("  -u UUID .. if specified, find an element by its UUID");
 		result.add("  -n name .. if specified, find an element by its name");
+		result.add("  -p path .. if specified, find an element by its full path");
 		result.add("  -t type .. if specified, find an element by its xsi type");
 		result.add("  -x xmltag .. if specified, find an element by its xml tag");
 		result.add("");
 		result.add("  longer alternatives (which are doing the same) are:");
 		result.add("  -uuid UUID");
 		result.add("  -name name");
+		result.add("  -path path");
 		result.add("  -type type");
 		result.add("  -xml xmltag");
 
