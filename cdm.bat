@@ -1,7 +1,7 @@
 @echo off
 
 REM   check if we are running a 64-Bit version of Java
-java -version 2>&1 | find "64-Bit"
+java -version 2>&1 | find "64-Bit" >nul
 
 if errorlevel 1 goto :32bit
 
