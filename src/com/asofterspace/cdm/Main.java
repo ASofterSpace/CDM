@@ -4,27 +4,28 @@
  */
 package com.asofterspace.cdm;
 
-import com.asofterspace.cdm.commands.Create;
-import com.asofterspace.cdm.commands.Convert;
 import com.asofterspace.cdm.commands.Compare;
-import com.asofterspace.cdm.commands.Validate;
+import com.asofterspace.cdm.commands.Convert;
+import com.asofterspace.cdm.commands.Create;
+import com.asofterspace.cdm.commands.Extract;
+import com.asofterspace.cdm.commands.Find;
+import com.asofterspace.cdm.commands.Help;
 import com.asofterspace.cdm.commands.Info;
+import com.asofterspace.cdm.commands.Print;
 import com.asofterspace.cdm.commands.Root;
 import com.asofterspace.cdm.commands.Tree;
-import com.asofterspace.cdm.commands.Find;
-import com.asofterspace.cdm.commands.Print;
 import com.asofterspace.cdm.commands.Uuid;
+import com.asofterspace.cdm.commands.Validate;
 import com.asofterspace.cdm.commands.Version;
 import com.asofterspace.cdm.commands.VersionForZip;
-import com.asofterspace.cdm.commands.Help;
 import com.asofterspace.toolbox.Utils;
 
 
 public class Main {
 
 	public final static String PROGRAM_TITLE = "cdm commandline tool";
-	public final static String VERSION_NUMBER = "0.0.1.6beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "13. September 2018 - 12. January 2019";
+	public final static String VERSION_NUMBER = "0.0.1.7beta(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "13. September 2018 - 22. November 2019";
 
 
 	public static void main(String[] args) {
@@ -40,6 +41,7 @@ public class Main {
 		CommandCtrl.register(new Convert());
 		CommandCtrl.register(new Compare());
 		CommandCtrl.register(new Validate());
+		CommandCtrl.register(new Extract());
 		CommandCtrl.register(new Info());
 		CommandCtrl.register(new Root());
 		CommandCtrl.register(new Tree());
