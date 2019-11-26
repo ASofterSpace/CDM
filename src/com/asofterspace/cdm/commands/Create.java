@@ -9,6 +9,7 @@ import com.asofterspace.cdm.interfaces.Command;
 import com.asofterspace.toolbox.cdm.CdmCtrl;
 import com.asofterspace.toolbox.cdm.exceptions.AttemptingEmfException;
 import com.asofterspace.toolbox.cdm.exceptions.CdmLoadingException;
+import com.asofterspace.toolbox.cdm.exceptions.CdmSavingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,23 +42,23 @@ public class Create implements Command {
 		String version = "-";
 
 		Map<String, String> arguments = CommandCtrl.getArgumentMap();
-		
+
 		if (arguments.containsKey("-t")) {
 			template = arguments.get("-t");
 		}
-		
+
 		if (arguments.containsKey("-f")) {
 			format = arguments.get("-f");
 		}
-		
+
 		if (arguments.containsKey("-p")) {
 			prefix = arguments.get("-p");
 		}
-		
+
 		if (arguments.containsKey("-v")) {
 			version = arguments.get("-v");
 		}
-		
+
 		// replace defaults
 		if ("-".equals(template)) {
 			template = CdmCtrl.getTemplates().get(0);
@@ -86,12 +87,12 @@ public class Create implements Command {
 			// TODO :: do not ignore the format ;)
 			CdmCtrl cdmCtrl = new CdmCtrl();
 			cdmCtrl.createNewCdm(CommandCtrl.getPathArg(), version, prefix, template);
-			
-		} catch (AttemptingEmfException | CdmLoadingException e) {
+
+		} catch (AttemptingEmfException | CdmSavingException | CdmLoadingException e) {
 			System.err.println(e.getMessage());
 			System.exit(8);
 		}
-		
+
 		System.out.println("The new CDM has been created!");
 	}
 
